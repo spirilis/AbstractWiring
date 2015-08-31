@@ -21,7 +21,7 @@
  *   void analogReference(int);
  * function prototypes for delay, delayMicroseconds, optionally sleep, suspend, wakeup
  *   void delay(uint32_t milliseconds);
- *   void delayMicroseconds(unsigned int us);
+ *   void delayMicroseconds(uint16_t us);
  *   void sleep(uint32_t milliseconds);
  *   void suspend(void);
  *   void wakeup(void);
@@ -38,6 +38,12 @@
  * function prototypes for makeWord(uint16_t), makeWord(uint8_t h, uint8_t l)
  *   unsigned int makeWord(uint16_t w);
  *   unsigned int makeWord(uint8_t h, uint8_t l);
+ * function prototypes for itoa(), dtostrf()
+ *   char * itoa( int value, char *string, int radix ) ;
+ *   char * ltoa( long value, char *string, int radix ) ;
+ *   char * utoa( unsigned long value, char *string, int radix ) ;
+ *   char * ultoa( unsigned long value, char *string, int radix ) ;
+ *   char * dtostrf (double val, signed char width, unsigned char prec, char *sout);
  *
  * provide access to any Serial port implementations; it's strongly recommended this file provide an
  *   "extern <some derivative class type of AbstractSerial> Serial;" so all apps including Arduino.h will
@@ -117,7 +123,6 @@ long random(long);
 long random(long, long);
 void randomSeed(unsigned int);
 long map(long, long, long, long, long);
-#include <dtostrf.h>
 
 #endif /* __cplusplus */
 

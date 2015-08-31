@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-uint16_t s_printf(char *instr, char *format, ...);
+uint16_t s_printf(char *instr, const char *format, ...);
 
 #ifdef __cplusplus
 };  /* extern "C" */

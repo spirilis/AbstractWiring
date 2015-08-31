@@ -30,6 +30,11 @@
 
 #define F_CPU 16000000L
 
+// C linkage (no function overloading)
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ALWAYS_INLINE void interrupts() { __bis_SR_register(GIE); }
 ALWAYS_INLINE void noInterrupts() { __bic_SR_register(GIE); }
 
@@ -42,7 +47,7 @@ void analogReference(int);
 void analogFrequency(uint16_t);
 
 void delay(uint32_t milliseconds);
-void delayMicroseconds(unsigned int us);
+void delayMicroseconds(uint16_t us);
 void sleep(uint32_t milliseconds);
 void suspend(void);
 void wakeup(void);
@@ -56,8 +61,20 @@ unsigned long pulseIn(int pin, uint8_t state, unsigned long timeout = 1000000L);
 void tone(int _pin, unsigned int frequency, unsigned long duration = 0);
 void noTone(int _pin);
 
+char * itoa( int value, char *string, int radix ) ;
+char * ltoa( long value, char *string, int radix ) ;
+char * utoa( unsigned long value, char *string, int radix ) ;
+char * ultoa( unsigned long value, char *string, int radix ) ;
+char * dtostrf (double val, signed char width, unsigned char prec, char *sout);
+
+#ifdef __cplusplus
+}; /* extern "C" */
+#endif
+
+// C++ linkage (function overloading allowed)
 uint16_t makeWord(uint16_t);
 uint16_t makeWord(uint8_t, uint8_t);
+
 
 
 #endif
