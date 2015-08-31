@@ -1,0 +1,268 @@
+msp430-elf-g++ -Os -Wall -g -mmcu=msp430g2553 -fdata-sections -ffunction-sections -Wl,--gc-sections -fno-exceptions -fno-rtti -I. -I.. -I../../../AbstractWiring/ -o test.elf *.cpp ../*.cpp ../../../AbstractWiring/*.cpp 
+../platform.cpp: In function 'void pinMode(int, int)':
+../platform.cpp:8:31: error: conflicting declaration of 'void pinMode(int, int)' with 'C' linkage
+ void pinMode(int pin, int mode)
+                               ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:36:6: note: previous declaration with 'C++' linkage
+ void pinMode(int, int);
+      ^
+../platform.cpp: In function 'void digitalWrite(int, uint8_t)':
+../platform.cpp:12:41: error: conflicting declaration of 'void digitalWrite(int, uint8_t)' with 'C' linkage
+ void digitalWrite(int pin, uint8_t value)
+                                         ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:37:6: note: previous declaration with 'C++' linkage
+ void digitalWrite(int, uint8_t);
+      ^
+../platform.cpp: In function 'int digitalRead(int)':
+../platform.cpp:16:24: error: conflicting declaration of 'int digitalRead(int)' with 'C' linkage
+ int digitalRead(int pin)
+                        ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:38:5: note: previous declaration with 'C++' linkage
+ int digitalRead(int);
+     ^
+../platform.cpp: In function 'uint16_t analogRead(int)':
+../platform.cpp:21:28: error: conflicting declaration of 'uint16_t analogRead(int)' with 'C' linkage
+ uint16_t analogRead(int pin)
+                            ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:39:10: note: previous declaration with 'C++' linkage
+ uint16_t analogRead(int);
+          ^
+../platform.cpp: In function 'void analogWrite(int, int)':
+../platform.cpp:26:39: error: conflicting declaration of 'void analogWrite(int, int)' with 'C' linkage
+ void analogWrite(int pin, int pwmvalue)
+                                       ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:40:6: note: previous declaration with 'C++' linkage
+ void analogWrite(int, int);
+      ^
+../platform.cpp: In function 'void analogReference(int)':
+../platform.cpp:30:30: error: conflicting declaration of 'void analogReference(int)' with 'C' linkage
+ void analogReference(int vref)
+                              ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:41:6: note: previous declaration with 'C++' linkage
+ void analogReference(int);
+      ^
+../platform.cpp: In function 'void analogFrequency(uint16_t)':
+../platform.cpp:34:35: error: conflicting declaration of 'void analogFrequency(uint16_t)' with 'C' linkage
+ void analogFrequency(uint16_t freq)
+                                   ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:42:6: note: previous declaration with 'C++' linkage
+ void analogFrequency(uint16_t);
+      ^
+../platform.cpp: In function 'void delay(uint32_t)':
+../platform.cpp:38:23: error: conflicting declaration of 'void delay(uint32_t)' with 'C' linkage
+ void delay(uint32_t ms)
+                       ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:44:6: note: previous declaration with 'C++' linkage
+ void delay(uint32_t milliseconds);
+      ^
+../platform.cpp: In function 'void sleep(uint32_t)':
+../platform.cpp:46:23: error: conflicting declaration of 'void sleep(uint32_t)' with 'C' linkage
+ void sleep(uint32_t ms)
+                       ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:46:6: note: previous declaration with 'C++' linkage
+ void sleep(uint32_t milliseconds);
+      ^
+../platform.cpp: In function 'void suspend()':
+../platform.cpp:50:18: error: conflicting declaration of 'void suspend()' with 'C' linkage
+ void suspend(void)
+                  ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:47:6: note: previous declaration with 'C++' linkage
+ void suspend(void);
+      ^
+../platform.cpp: In function 'void wakeup()':
+../platform.cpp:54:17: error: conflicting declaration of 'void wakeup()' with 'C' linkage
+ void wakeup(void)
+                 ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:48:6: note: previous declaration with 'C++' linkage
+ void wakeup(void);
+      ^
+../platform.cpp: In function 'void attachInterrupt(int, void (*)(), int)':
+../platform.cpp:58:63: error: conflicting declaration of 'void attachInterrupt(int, void (*)(), int)' with 'C' linkage
+ void attachInterrupt(int pin, void (*userFunc)(void), int mode)
+                                                               ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:50:6: note: previous declaration with 'C++' linkage
+ void attachInterrupt(int, void (*)(void), int mode);
+      ^
+../platform.cpp: In function 'void detachInterrupt(int)':
+../platform.cpp:62:29: error: conflicting declaration of 'void detachInterrupt(int)' with 'C' linkage
+ void detachInterrupt(int pin)
+                             ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:51:6: note: previous declaration with 'C++' linkage
+ void detachInterrupt(int);
+      ^
+../platform.cpp: In function 'long unsigned int micros()':
+../platform.cpp:66:26: error: conflicting declaration of 'long unsigned int micros()' with 'C' linkage
+ unsigned long micros(void)
+                          ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:52:15: note: previous declaration with 'C++' linkage
+ unsigned long micros();
+               ^
+../platform.cpp: In function 'long unsigned int millis()':
+../platform.cpp:71:26: error: conflicting declaration of 'long unsigned int millis()' with 'C' linkage
+ unsigned long millis(void)
+                          ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:53:15: note: previous declaration with 'C++' linkage
+ unsigned long millis();
+               ^
+../platform.cpp: In function 'long unsigned int pulseIn(int, uint8_t, long unsigned int)':
+../platform.cpp:76:68: error: conflicting declaration of 'long unsigned int pulseIn(int, uint8_t, long unsigned int)' with 'C' linkage
+ unsigned long pulseIn(int pin, uint8_t state, unsigned long timeout)
+                                                                    ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:55:15: note: previous declaration with 'C++' linkage
+ unsigned long pulseIn(int pin, uint8_t state, unsigned long timeout = 1000000L);
+               ^
+../platform.cpp: In function 'void tone(int, unsigned int, long unsigned int)':
+../platform.cpp:81:67: error: conflicting declaration of 'void tone(int, unsigned int, long unsigned int)' with 'C' linkage
+ void tone(int _pin, unsigned int frequency, unsigned long duration)
+                                                                   ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:56:6: note: previous declaration with 'C++' linkage
+ void tone(int _pin, unsigned int frequency, unsigned long duration = 0);
+      ^
+../platform.cpp: In function 'void noTone(int)':
+../platform.cpp:85:21: error: conflicting declaration of 'void noTone(int)' with 'C' linkage
+ void noTone(int _pin)
+                     ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:57:6: note: previous declaration with 'C++' linkage
+ void noTone(int _pin);
+      ^
+../platform.cpp: In function 'uint16_t makeWord(uint16_t)':
+../platform.cpp:89:29: error: conflicting declaration of 'uint16_t makeWord(uint16_t)' with 'C' linkage
+ uint16_t makeWord(uint16_t w)
+                             ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:59:10: note: previous declaration with 'C++' linkage
+ uint16_t makeWord(uint16_t);
+          ^
+../platform.cpp: In function 'uint16_t makeWord(uint8_t, uint8_t)':
+../platform.cpp:94:39: error: conflicting declaration of 'uint16_t makeWord(uint8_t, uint8_t)' with 'C' linkage
+ uint16_t makeWord(uint8_t h, uint8_t l)
+                                       ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:60:10: note: previous declaration with 'C++' linkage
+ uint16_t makeWord(uint8_t, uint8_t);
+          ^
+../platform.cpp: In function 'char* itoa(int, char*, int)':
+../platform.cpp:100:49: error: conflicting declaration of 'char* itoa(int, char*, int)' with 'C' linkage
+ char * itoa( int value, char *string, int radix )
+                                                 ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:62:8: note: previous declaration with 'C++' linkage
+ char * itoa( int value, char *string, int radix ) ;
+        ^
+../platform.cpp: In function 'char* ltoa(long int, char*, int)':
+../platform.cpp:105:50: error: conflicting declaration of 'char* ltoa(long int, char*, int)' with 'C' linkage
+ char * ltoa( long value, char *string, int radix )
+                                                  ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:63:8: note: previous declaration with 'C++' linkage
+ char * ltoa( long value, char *string, int radix ) ;
+        ^
+../platform.cpp: In function 'char* utoa(long unsigned int, char*, int)':
+../platform.cpp:155:59: error: conflicting declaration of 'char* utoa(long unsigned int, char*, int)' with 'C' linkage
+ char * utoa( unsigned long value, char *string, int radix )
+                                                           ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:64:8: note: previous declaration with 'C++' linkage
+ char * utoa( unsigned long value, char *string, int radix ) ;
+        ^
+../platform.cpp: In function 'char* ultoa(long unsigned int, char*, int)':
+../platform.cpp:160:60: error: conflicting declaration of 'char* ultoa(long unsigned int, char*, int)' with 'C' linkage
+ char * ultoa( unsigned long value, char *string, int radix )
+                                                            ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:65:8: note: previous declaration with 'C++' linkage
+ char * ultoa( unsigned long value, char *string, int radix ) ;
+        ^
+../platform.cpp: In function 'char* dtostrf(double, signed char, unsigned char, char*)':
+../platform.cpp:198:78: error: conflicting declaration of 'char* dtostrf(double, signed char, unsigned char, char*)' with 'C' linkage
+ char * dtostrf (double val, signed char width, unsigned char prec, char *sout) {
+                                                                              ^
+In file included from ../../../AbstractWiring/AbstractWiring.h:61:0,
+                 from ../../../AbstractWiring/Arduino.h:4,
+                 from ../platform.cpp:3:
+../platform.h:66:8: note: previous declaration with 'C++' linkage
+ char * dtostrf (double val, signed char width, unsigned char prec, char *sout);
+        ^
+../platform.cpp: In function 'char* dtostrf(double, signed char, unsigned char, char*)':
+../platform.cpp:207:45: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+   s_printf(fmt, "%%0%dd.%%0%dd", width, prec);
+                                             ^
+In file included from ../../../AbstractWiring/IPAddress.cpp:3:0:
+../../../AbstractWiring/IPAddress.h: In member function 'IPAddress::operator uint32_t()':
+../../../AbstractWiring/IPAddress.h:51:55: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+     operator uint32_t() { return *((uint32_t*)_address); };
+                                                       ^
+../../../AbstractWiring/IPAddress.h: In member function 'bool IPAddress::operator==(const IPAddress&)':
+../../../AbstractWiring/IPAddress.h:52:75: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+     bool operator==(const IPAddress& addr) { return (*((uint32_t*)_address)) == (*((uint32_t*)addr._address)); };
+                                                                           ^
+../../../AbstractWiring/IPAddress.h:52:108: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+     bool operator==(const IPAddress& addr) { return (*((uint32_t*)_address)) == (*((uint32_t*)addr._address)); };
+                                                                                                            ^
+make: *** [test.elf] Error 1
