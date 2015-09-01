@@ -95,7 +95,8 @@ void attachInterrupt(int, void (*)(void), int mode);
 void detachInterrupt(int);
 unsigned long micros();
 unsigned long millis();
-extern volatile uint32_t _sys_millis, _sys_micros;
+extern volatile uint32_t _sys_millis;
+extern volatile uint16_t _sys_micros;
 extern volatile boolean _sys_asleep;
 
 unsigned long pulseIn(int pin, uint8_t state, unsigned long timeout = 1000000L);

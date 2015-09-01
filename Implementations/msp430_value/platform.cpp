@@ -10,98 +10,123 @@ extern "C" {
 // Pin# equals P1.0 thru P4.7, with 1-8 = P1.0-P1.7, 9-16 = P2.0-P2.7, 17-24 = P3.0-P3.7, 25-32 = P4.0-P4.7
 
 enum msp430_sfr {
-    PxIN = 1, PxOUT, PxDIR, PxREN, PxIE, PxIFG, PxSEL, PxSEL2
+    PxIN = 1, PxOUT, PxDIR, PxREN, PxSEL, PxSEL2
 };
 
 // avoid bitshifts with this
 static uint8_t _bitvect[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
+
+// This stuff would normally be split out into a pins.h or pins.c file (e.g. pins_energia.h from Energia)
+#define CVOL (const volatile uint8_t *)
+#define VOL (volatile uint8_t *)
+
+const volatile uint8_t * _pxin[] = {CVOL &P1IN, CVOL &P2IN,
+#ifdef __MSP430_HAS_PORT3_R__
+CVOL &P3IN,
+#else
+NULL,
+#endif
+#ifdef __MSP430_HAS_PORT4_R__
+CVOL &P4IN,
+#else
+NULL
+#endif
+};
+
+const volatile uint8_t * _pxout[] = {CVOL &P1OUT, CVOL &P2OUT,
+#ifdef __MSP430_HAS_PORT3_R__
+CVOL &P3OUT,
+#else
+NULL,
+#endif
+#ifdef __MSP430_HAS_PORT4_R__
+CVOL &P4OUT
+#else
+NULL
+#endif
+};
+
+const volatile uint8_t * _pxdir[] = {CVOL &P1DIR, CVOL &P2DIR,
+#ifdef __MSP430_HAS_PORT3_R__
+CVOL &P3DIR,
+#else
+NULL,
+#endif
+#ifdef __MSP430_HAS_PORT4_R__
+CVOL &P4DIR,
+#else
+NULL
+#endif
+};
+
+const volatile uint8_t * _pxren[] = {CVOL &P1REN, CVOL &P2REN,
+#ifdef __MSP430_HAS_PORT3_R__
+CVOL &P3REN,
+#else
+NULL,
+#endif
+#ifdef __MSP430_HAS_PORT4_R__
+CVOL &P4REN
+#else
+NULL
+#endif
+};
+
+const volatile uint8_t * _pxsel[] = {CVOL &P1SEL, CVOL &P2SEL,
+#ifdef __MSP430_HAS_PORT3_R__
+CVOL &P3SEL,
+#else
+NULL,
+#endif
+#ifdef __MSP430_HAS_PORT4_R__
+CVOL &P4SEL,
+#else
+NULL
+#endif
+};
+
+const volatile uint8_t * _pxsel2[] = {CVOL &P1SEL2, CVOL &P2SEL2,
+#ifdef __MSP430_HAS_PORT3_R__
+CVOL &P3SEL2,
+#else
+NULL,
+#endif
+#ifdef __MSP430_HAS_PORT4_R__
+CVOL &P4SEL2,
+#else
+NULL
+#endif
+};
+
 static volatile uint8_t * _msp430_get_port(int pin, enum msp430_sfr sfr)
 {
+    int lidx = (pin - 1) / 8;    
+
     switch (sfr) {
         case PxIN:
-            if (pin < 9) return (volatile uint8_t *)&P1IN;
-            if (pin < 17) return (volatile uint8_t *)&P2IN;
-            #ifdef __MSP430_HAS_PORT3_R__
-            if (pin < 25) return (volatile uint8_t *)&P3IN;
-            #ifdef __MSP430_HAS_PORT4_R__
-            if (pin < 33) return (volatile uint8_t *)&P4IN;
-            #endif
-            #endif
+            return VOL _pxin[lidx];
             break;
         case PxOUT:
-            if (pin < 9) return &P1OUT;
-            if (pin < 17) return &P2OUT;
-            #ifdef __MSP430_HAS_PORT3_R__
-            if (pin < 25) return &P3OUT;
-            #ifdef __MSP430_HAS_PORT4_R__
-            if (pin < 33) return &P4OUT;
-            #endif
-            #endif
+            return VOL _pxout[lidx];
             break;
         case PxDIR:
-            if (pin < 9) return &P1DIR;
-            if (pin < 17) return &P2DIR;
-            #ifdef __MSP430_HAS_PORT3_R__
-            if (pin < 25) return &P3DIR;
-            #ifdef __MSP430_HAS_PORT4_R__
-            if (pin < 33) return &P4DIR;
-            #endif
-            #endif
+            return VOL _pxdir[lidx];
             break;
         case PxREN:
-            if (pin < 9) return &P1REN;
-            if (pin < 17) return &P2REN;
-            #ifdef __MSP430_HAS_PORT3_R__
-            if (pin < 25) return &P3REN;
-            #ifdef __MSP430_HAS_PORT4_R__
-            if (pin < 33) return &P4REN;
-            #endif
-            #endif
-            break;
-        case PxIE:
-            if (pin < 9) return &P1IE;
-            if (pin < 17) return &P2IE;
-            #if defined(__MSP430_HAS_PORT3_R__) && defined(P3IE_)
-            if (pin < 25) return &P3IE;
-            #if defined(__MSP430_HAS_PORT4_R__) && defined(P4IE_)
-            if (pin < 33) return &P4IE;
-            #endif
-            #endif
-            break;
-        case PxIFG:
-            if (pin < 9) return &P1IFG;
-            if (pin < 17) return &P2IFG;
-            #if defined(__MSP430_HAS_PORT3_R__) && defined(P3IE_)
-            if (pin < 25) return &P3IFG;
-            #if defined(__MSP430_HAS_PORT4_R__) && defined(P4IE_)
-            if (pin < 33) return &P4IFG;
-            #endif
-            #endif
+            return VOL _pxren[lidx];
             break;
         case PxSEL:
-            if (pin < 9) return &P1SEL;
-            if (pin < 17) return &P2SEL;
-            #ifdef __MSP430_HAS_PORT3_R__
-            if (pin < 25) return &P3SEL;
-            #ifdef __MSP430_HAS_PORT4_R__
-            if (pin < 33) return &P4SEL;
-            #endif
-            #endif
+            return VOL _pxsel[lidx];
             break;
         case PxSEL2:
-            if (pin < 9) return &P1SEL2;
-            if (pin < 17) return &P2SEL2;
-            #ifdef __MSP430_HAS_PORT3_R__
-            if (pin < 25) return &P3SEL2;
-            #ifdef __MSP430_HAS_PORT4_R__
-            if (pin < 33) return &P4SEL2;
-            #endif
-            #endif
+            return VOL _pxsel2[lidx];
             break;
     }
     return NULL;
 }
+//////////////////////
+
 
 void pinMode(int pin, int mode)
 {
@@ -114,13 +139,13 @@ void pinMode(int pin, int mode)
     volatile uint8_t *pxren = _msp430_get_port(pin, PxREN);
     volatile uint8_t *pxsel = _msp430_get_port(pin, PxSEL);
     volatile uint8_t *pxsel2 = _msp430_get_port(pin, PxSEL2);
+    *pxsel &= ~pxbit;
+    *pxsel2 &= ~pxbit;
 
     switch (mode) {
         case INPUT:
         case INPUT_PULLUP:
         case INPUT_PULLDOWN:
-            *pxsel &= ~pxbit;
-            *pxsel2 &= ~pxbit;
             *pxdir &= ~pxbit;
             if (mode > INPUT) {
                 volatile uint8_t *pxout = _msp430_get_port(pin, PxOUT);
@@ -136,8 +161,6 @@ void pinMode(int pin, int mode)
             }
             break;
         case OUTPUT:
-            *pxsel &= ~pxbit;
-            *pxsel2 &= ~pxbit;
             *pxdir |= pxbit;
             break;
     }
@@ -299,13 +322,14 @@ void P1_ISR(void)
 {
     uint16_t i = 0, j = 0x01;
     while (!(j & 0x0100)) {
-        if (P1IFG & j) {
+        if ((P1IFG & j) && (P1IE & j)) {
             intVect_P1[i]();
+            P1IFG &= ~j;
             if (intVectMode.p1 & j)
                 P1IES ^= j;
-            i++;
-            j <<= 1;
         }
+        i++;
+        j *= 2;
     }
     if (!_sys_asleep)
         __bic_SR_register_on_exit(LPM4_bits);
@@ -316,13 +340,14 @@ void P2_ISR(void)
 {
     uint16_t i = 0, j = 0x01;
     while (!(j & 0x0100)) {
-        if (P2IFG & j) {
+        if ((P2IFG & j) && (P2IE & j)) {
             intVect_P2[i]();
+            P2IFG &= ~j;
             if (intVectMode.p2 & j)
                 P2IES ^= j;
-            i++;
-            j <<= 1;
         }
+        i++;
+        j *= 2;
     }
     if (!_sys_asleep)
         __bic_SR_register_on_exit(LPM4_bits);
@@ -463,7 +488,8 @@ char * dtostrf (double val, signed char width, unsigned char prec, char *sout) {
   return sout;
 }
 
-volatile uint32_t _sys_millis, _sys_micros;
+volatile uint32_t _sys_millis;
+volatile uint16_t _sys_micros;
 volatile uint16_t _sys_micros_per_wdt;
 
 __attribute__((interrupt(WDT_VECTOR)))
@@ -492,10 +518,10 @@ void watchdog_isr (void)
 void sysinit(unsigned long mclk)
 {
     if (mclk < 8000000UL) {
-        WDTCTL = WDTPW | WDTTMSEL | WDTIS1;
+        WDTCTL = WDTPW | WDTCNTCL | WDTTMSEL | WDTIS1;
         _sys_micros_per_wdt = 512 / (mclk / 1000000UL);
     } else {
-        WDTCTL = WDTPW | WDTTMSEL | WDTIS0;
+        WDTCTL = WDTPW | WDTCNTCL | WDTTMSEL | WDTIS0;
         _sys_micros_per_wdt = 8192 / (mclk / 1000000UL);
     }
     _sys_millis = 0;

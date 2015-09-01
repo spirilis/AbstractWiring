@@ -88,10 +88,11 @@ typedef uint16_t word;
  *   char * utoa( unsigned long value, char *string, int radix ) ;
  *   char * ultoa( unsigned long value, char *string, int radix ) ;
  *   char * dtostrf (double val, signed char width, unsigned char prec, char *sout);
+ * function prototype or include necessary C-library primitives for atof()
  *
  * provide access to any Serial port implementations; it's strongly recommended this file provide an
  *   "extern <some derivative class type of AbstractSerial> Serial;" so all apps including Arduino.h will
- *   have access to the "Serial" object.
+ *   have access to the "Serial" object.  It's not strictly required, just a good idea to assist debugging.
  *
  *
  * Since these are all very implementation-specific, platform.h should broker their exposure to the general-purpose libraries
