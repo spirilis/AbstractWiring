@@ -4,7 +4,7 @@
 #include <UART_USCI.h>
 
 
-UART_USCI *isr_uscia0_uart_instance = NULL;
+UART_USCI_EXTISR *isr_uscia0_uart_instance = NULL;
 
 extern "C" {
 

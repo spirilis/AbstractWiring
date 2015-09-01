@@ -3,13 +3,56 @@
 #include <UART_USCI.h>
 #include <usci_isr.h>
 
-UART_USCI::UART_USCI(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+
+UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::UART_USCI(void)
 {
     buffer.txbuffer = txbuffer;
     buffer.rxbuffer = rxbuffer;
 }
 
-void UART_USCI::begin(unsigned long bitrate)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::begin(unsigned long bitrate)
 {
     usci_isr_installer();
     isr_uscia0_uart_instance = this;
@@ -22,26 +65,26 @@ void UART_USCI::begin(unsigned long bitrate)
 
     configClock(bitrate);
 
-    ucactl1 &= ~UCSWRST;
+    ucactl1 &= ~(UCSWRST);
     switch (pxsel_specification) {
         case PORT_SELECTION_NONE:
             pxsel &= ~pxbits;
-            if (pxsel2 != NULL)
+            if (&pxsel2 != NULL)
                 pxsel2 &= ~pxbits;
             break;
         case PORT_SELECTION_0:
             pxsel |= pxbits;
-            if (pxsel2 != NULL)
+            if (&pxsel2 != NULL)
                 pxsel2 &= ~pxbits;
             break;
         case PORT_SELECTION_1:
             pxsel &= ~pxbits;
-            if (pxsel2 != NULL)
+            if (&pxsel2 != NULL)
                 pxsel2 |= pxbits;
             break;
         case PORT_SELECTION_0_AND_1:
             pxsel |= pxbits;
-            if (pxsel2 != NULL)
+            if (&pxsel2 != NULL)
                 pxsel2 |= pxbits;
     }
     ucaie |= ucarxie;
@@ -52,7 +95,28 @@ void UART_USCI::begin(unsigned long bitrate)
     buffer.rx_tail = 0;
 }
 
-void UART_USCI::configClock(unsigned long bitrate)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::configClock(unsigned long bitrate)
 {
     uint16_t mod;
     uint32_t divider;
@@ -76,7 +140,28 @@ void UART_USCI::configClock(unsigned long bitrate)
     ucamctl = (uint8_t) (oversampling ? UCOS16 : 0x00) | mod;
 }
 
-void UART_USCI::end(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::end(void)
 {
     ucaie &= ~(ucatxie | ucarxie);
     pxsel &= ~(pxbits);
@@ -89,7 +174,28 @@ void UART_USCI::end(void)
     buffer.rx_tail = 0;
 }
 
-void UART_USCI::isr_send_char(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::isr_send_char(void)
 {
     if (buffer.tx_head == buffer.tx_tail) {
         // Buffer empty; disable interrupts
@@ -104,7 +210,28 @@ void UART_USCI::isr_send_char(void)
     ucatxbuf = c;
 }
 
-void UART_USCI::isr_get_char(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::isr_get_char(void)
 {
     uint8_t c = ucarxbuf;
     unsigned int i = (buffer.rx_head + 1) % rx_buffer_size;
@@ -115,19 +242,82 @@ void UART_USCI::isr_get_char(void)
     }   // else ... ignore the char (buffer full)
 }
 
-int UART_USCI::available(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+int UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::available(void)
 {
     return (rx_buffer_size + buffer.rx_head - buffer.rx_tail) % rx_buffer_size;
 }
 
-int UART_USCI::peek(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+int UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::peek(void)
 {
     if (buffer.rx_head == buffer.rx_tail)
         return -1;
     return buffer.rxbuffer[buffer.rx_tail];
 }
 
-int UART_USCI::read(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+int UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::read(void)
 {
     if (buffer.rx_head == buffer.rx_tail)
         return -1;
@@ -137,13 +327,55 @@ int UART_USCI::read(void)
     return c;
 }
 
-void UART_USCI::flush(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::flush(void)
 {
     while (buffer.tx_head != buffer.tx_tail)
         ;
 }
 
-size_t UART_USCI::write(uint8_t c)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+size_t UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::write(uint8_t c)
 {
     unsigned int i = (buffer.tx_head + 1) % tx_buffer_size;
 
@@ -168,24 +400,87 @@ size_t UART_USCI::write(uint8_t c)
     return 1;
 }
 
-UART_USCI::operator bool()
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::operator bool()
 {
     if (ucactl1 & UCSWRST)
         return false;
     return true;
 }
 
-void UART_USCI::set7Bit(boolean yn)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::set7Bit(boolean yn)
 {
     ucactl1 |= UCSWRST;
     if (yn)
         ucactl0 |= UC7BIT;
     else
-        ucactl0 &= ~UC7BIT;
-    ucactl1 &= ~UCSWRST;
+        ucactl0 &= ~(UC7BIT);
+    ucactl1 &= ~(UCSWRST);
 }
 
-void UART_USCI::setStopBits(int s)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::setStopBits(int s)
 {
     if (s < 1 || s > 2)
         return;
@@ -193,29 +488,71 @@ void UART_USCI::setStopBits(int s)
     if (s == 2)
         ucactl0 |= UCSPB;
     else
-        ucactl0 &= ~UCSPB;
-    ucactl1 &= ~UCSWRST;
+        ucactl0 &= ~(UCSPB);
+    ucactl1 &= ~(UCSWRST);
 }
 
-void UART_USCI::setParity(enum SerialParity setting)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::setParity(enum SerialParity setting)
 {
     ucactl1 |= UCSWRST;
     switch (setting) {
         case PARITY_NONE:
-            ucactl0 &= ~UCPEN;
+            ucactl0 &= ~(UCPEN);
             break;
         case PARITY_ODD:
             ucactl0 |= UCPEN;
-            ucactl0 &= ~UCPAR;
+            ucactl0 &= ~(UCPAR);
             break;
         case PARITY_EVEN:
             ucactl0 |= UCPEN;
             ucactl0 |= UCPAR;
     }
-    ucactl1 &= ~UCSWRST;
+    ucactl1 &= ~(UCSWRST);
 }
 
-void UART_USCI::sendBreak(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::sendBreak(void)
 {
     if (ucactl1 & UCSWRST)
         return;
@@ -231,7 +568,28 @@ void UART_USCI::sendBreak(void)
     ucaie |= txie_save;
 }
 
-void UART_USCI::attachBreakInterrupt(SERIAL_BREAK_CALLBACK callback)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::attachBreakInterrupt(SERIAL_BREAK_CALLBACK callback)
 {
     if (callback == NULL)
         return;
@@ -239,13 +597,34 @@ void UART_USCI::attachBreakInterrupt(SERIAL_BREAK_CALLBACK callback)
     ucactl1 |= UCSWRST;
     ucactl1 |= UCBRKIE;
     breakcb = callback;
-    ucactl1 &= ~UCSWRST;
+    ucactl1 &= ~(UCSWRST);
 }
 
-void UART_USCI::detachBreakInterrupt(void)
+template <
+    u8_SFR ucactl0,
+    u8_SFR ucactl1,
+    u8_SFR ucamctl,
+    u8_SFR ucaabctl,
+    u8_SFR ucabr0,
+    u8_SFR ucabr1,
+    u8_SFR ucastat,
+    u8_SFR ucatxbuf,
+    u8_CSFR ucarxbuf,
+    u8_SFR ucaie,
+    uint8_t ucatxie,
+    uint8_t ucarxie,
+    volatile char * txbuffer,
+    volatile char * rxbuffer,
+    size_t tx_buffer_size,
+    size_t rx_buffer_size,
+    u8_SFR pxsel,
+    u8_SFR pxsel2,
+    enum PortselMode pxsel_specification,
+    uint8_t pxbits >
+void UART_USCI<ucactl0,ucactl1,ucamctl,ucaabctl,ucabr0,ucabr1,ucastat,ucatxbuf,ucarxbuf,ucaie,ucatxie,ucarxie,txbuffer,rxbuffer,tx_buffer_size,rx_buffer_size,pxsel,pxsel2,pxsel_specification,pxbits>::detachBreakInterrupt(void)
 {
     ucactl1 |= UCSWRST;
     breakcb = NULL;
-    ucactl1 &= ~UCBRKIE;
-    ucactl1 &= ~UCSWRST;
+    ucactl1 &= ~(UCBRKIE);
+    ucactl1 &= ~(UCSWRST);
 }

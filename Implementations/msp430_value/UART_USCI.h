@@ -4,7 +4,7 @@
 #define UART_USCI_H
 
 #include <AbstractWiring.h>
-#include <AbstractSerial.h>
+#include <UART_USCI_EXTISR.h>
 
 struct USCI_UART_Buffer {
     volatile char *txbuffer, *rxbuffer;
@@ -19,10 +19,10 @@ enum PortselMode {
     PORT_SELECTION_0_AND_1
 };
 
-typedef const volatile uint8_t * u8_CSFR;
-typedef volatile uint8_t * u8_SFR;
-typedef const volatile uint16_t * u16_CSFR;
-typedef volatile uint16_t * u16_SFR;
+typedef const volatile uint8_t & u8_CSFR;
+typedef volatile uint8_t & u8_SFR;
+typedef const volatile uint16_t & u16_CSFR;
+typedef volatile uint16_t & u16_SFR;
 
 template <
     u8_SFR ucactl0,
@@ -33,7 +33,7 @@ template <
     u8_SFR ucabr1,
     u8_SFR ucastat,
     u8_SFR ucatxbuf,
-    u8_SFR ucarxbuf,
+    u8_CSFR ucarxbuf,
     u8_SFR ucaie,
     uint8_t ucatxie,
     uint8_t ucarxie,
@@ -46,7 +46,7 @@ template <
     enum PortselMode pxsel_specification,
     uint8_t pxbits >
 
-class UART_USCI : public AbstractSerial {
+class UART_USCI : public UART_USCI_EXTISR {
     private:
         volatile struct USCI_UART_Buffer buffer;
         unsigned long _baud;
