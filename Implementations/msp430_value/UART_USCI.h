@@ -5,12 +5,9 @@
 
 #include <AbstractWiring.h>
 #include <UART_USCI_EXTISR.h>
+#include <usci_isr.h>
 
-struct USCI_UART_Buffer {
-    volatile char *txbuffer, *rxbuffer;
-    volatile unsigned int tx_head, tx_tail;
-    volatile unsigned int rx_head, rx_tail;
-};
+
 
 enum PortselMode {
     PORT_SELECTION_NONE = 0,
@@ -48,34 +45,227 @@ template <
 
 class UART_USCI : public UART_USCI_EXTISR {
     private:
-        volatile struct USCI_UART_Buffer buffer;
+        volatile unsigned int tx_head, tx_tail;
+        volatile unsigned int rx_head, rx_tail;
         unsigned long _baud;
         volatile SERIAL_BREAK_CALLBACK breakcb;
 
     public:
-        UART_USCI();
-        virtual void begin(unsigned long bitrate);
-        virtual void end(void);
+        UART_USCI() { ; };
 
-        virtual int available(void);
-        virtual int peek(void);
-        virtual int read(void);
-        virtual void flush(void);
-        virtual size_t write(uint8_t);
-        operator bool();
-        void isr_send_char(void);       // Utility function used by ISR handler
-        void isr_get_char(void);        // Utility function used by ISR handler
+        virtual void begin(unsigned long bitrate) {
+            usci_isr_installer();
+            isr_uscia0_uart_instance = this;
 
-        void configClock(unsigned long bitrate);
+            _baud = bitrate;
+            ucactl1 = UCSWRST;
+            ucactl1 |= UCSSEL_2;
+            ucactl0 = 0x00;  // Parity = none, 8 bits, 1 stop bit, LSB first.
+            ucaabctl = 0x00;
+
+            configClock(bitrate);
+
+            ucactl1 &= ~(UCSWRST);
+            switch (pxsel_specification) {
+                case PORT_SELECTION_NONE:
+                    pxsel &= ~pxbits;
+                    if (&pxsel2 != NULL)
+                        pxsel2 &= ~pxbits;
+                    break;
+                case PORT_SELECTION_0:
+                    pxsel |= pxbits;
+                    if (&pxsel2 != NULL)
+                        pxsel2 &= ~pxbits;
+                    break;
+                case PORT_SELECTION_1:
+                    pxsel &= ~pxbits;
+                    if (&pxsel2 != NULL)
+                        pxsel2 |= pxbits;
+                    break;
+                case PORT_SELECTION_0_AND_1:
+                    pxsel |= pxbits;
+                    if (&pxsel2 != NULL)
+                        pxsel2 |= pxbits;
+            }
+            ucaie |= ucarxie;
+
+            tx_head = 0;
+            tx_tail = 0;
+            rx_head = 0;
+            rx_tail = 0;
+    	};
+
+        virtual void end(void) {
+            ucaie &= ~(ucatxie | ucarxie);
+            pxsel &= ~(pxbits);
+            pxsel2 &= ~(pxbits);
+            ucactl1 |= UCSWRST;
+
+            tx_head = 0;
+            tx_tail = 0;
+            rx_head = 0;
+            rx_tail = 0;
+        };
+
+        virtual int available(void) { return (rx_buffer_size + rx_head - rx_tail) % rx_buffer_size; };
+        virtual int peek(void) { if (rx_head == rx_tail) return -1; return rxbuffer[rx_tail]; };
+
+        virtual int read(void) {
+            if (rx_head == rx_tail)
+                return -1;
+
+            uint8_t c = rxbuffer[rx_tail];
+            rx_tail = (unsigned int)(rx_tail + 1) % rx_buffer_size;
+            return c;
+        };
+
+        virtual void flush(void) { while (tx_head != tx_tail) ; };
+
+        virtual size_t write(uint8_t c) {
+            unsigned int i = (tx_head + 1) % tx_buffer_size;
+
+            // If the output buffer is full, we must wait.
+            if (i == tx_tail) {
+                // What to do next?
+                // First: Is the peripheral suspended?
+                if (ucactl1 & UCSWRST)
+                    return 0;  // Not getting anywhere busy-waiting on a suspended UART!
+                // Second, are interrupts disabled?
+                if ( !(__get_SR_register() & GIE) )
+                    return 0;  // No point in waiting for TX while the USCI IRQ can't fire!
+                    // ^ This should catch a common pitfall of Arduino users: Running Serial.print inside an interrupt routine.
+                // Else ... just wait.
+                while (i == tx_tail)
+                    ;
+            }
+
+            txbuffer[tx_head] = c;
+            tx_head = i;
+            ucaie |= ucatxie;
+            return 1;
+        };
+
+        operator bool() { if (ucactl1 & UCSWRST) return false; return true; };
+
+        void isr_send_char(void) {
+            if (tx_head == tx_tail) {
+                // Buffer empty; disable interrupts
+                ucaie &= ~ucatxie;
+                P1OUT &= ~BIT0;
+                return;
+            }
+
+            P1OUT |= BIT0;
+            uint8_t c = txbuffer[tx_tail];
+            tx_tail = (tx_tail + 1) % tx_buffer_size;
+            ucatxbuf = c;
+        };
+
+        void isr_get_char(void) {
+            uint8_t c = ucarxbuf;
+            unsigned int i = (rx_head + 1) % rx_buffer_size;
+
+            if (i != rx_tail) {
+                rxbuffer[rx_head] = c;
+                rx_head = i;
+            }   // else ... ignore the char (buffer full)
+        };
+
+        void configClock(unsigned long bitrate) {
+            uint16_t mod;
+            uint32_t divider;
+            boolean oversampling = false;
+
+            if (F_CPU / _baud >= 48)
+                oversampling = true;
+            divider = (F_CPU << 4) / _baud;
+            if (oversampling) {
+                mod = divider & 0xFFF0;               // UCBRFx = INT([(N/16) <96> INT(N/16)] <D7> 16)
+                divider >>= 8;
+            } else {
+                mod = ((divider & 0x0F) + 1) & 0x0E;  // UCBRSx (bit 1-3)
+                divider >>= 4;
+            }
+
+            uint16_t div16 = (uint16_t) divider;
+            ucabr0 = (uint8_t) div16;
+            asm volatile("swpb %[d]" : [d] "=r" (div16) : "r" (div16));
+            ucabr1 = (uint8_t) div16;
+            ucamctl = (uint8_t) (oversampling ? UCOS16 : 0x00) | mod;
+
+        };
 
         // Optional API is implemented
         virtual boolean hasExtendedAPI(void) { return true; };
-        virtual void set7Bit(boolean);
-        virtual void setStopBits(int);
-        virtual void setParity(enum SerialParity);
-        virtual void sendBreak(void);
-        virtual void attachBreakInterrupt(SERIAL_BREAK_CALLBACK);
-        virtual void detachBreakInterrupt(void);
+
+        virtual void set7Bit(boolean yn) {
+            ucactl1 |= UCSWRST;
+            if (yn)
+                ucactl0 |= UC7BIT;
+            else
+                ucactl0 &= ~(UC7BIT);
+            ucactl1 &= ~(UCSWRST);
+        };
+
+        virtual void setStopBits(int s) {
+            if (s < 1 || s > 2)
+                return;
+            ucactl1 |= UCSWRST;
+            if (s == 2)
+                ucactl0 |= UCSPB;
+            else
+                ucactl0 &= ~(UCSPB);
+            ucactl1 &= ~(UCSWRST);
+        };
+
+        virtual void setParity(enum SerialParity setting) {
+            ucactl1 |= UCSWRST;
+            switch (setting) {
+                case PARITY_NONE:
+                    ucactl0 &= ~(UCPEN);
+                    break;
+                case PARITY_ODD:
+                    ucactl0 |= UCPEN;
+                    ucactl0 &= ~(UCPAR);
+                    break;
+                case PARITY_EVEN:
+                    ucactl0 |= UCPEN;
+                    ucactl0 |= UCPAR;
+            }
+            ucactl1 &= ~(UCSWRST);
+        };
+
+        virtual void sendBreak(void) {
+            if (ucactl1 & UCSWRST)
+                return;
+
+            uint8_t txie_save = ucaie & ucatxie;
+            ucaie &= ~ucatxie;  // Avoid running the TX interrupt handler so we can fit in our BREAK
+
+            while (ucastat & UCBUSY)
+                ;  // Busy-wait until the last-transmitted character has finished sending
+
+            ucactl1 |= UCTXBRK;
+            ucatxbuf = 0x00;  // send it!  UCTXBRK is automatically cleared per TI document SLAU144
+            ucaie |= txie_save;
+        };
+
+        virtual void attachBreakInterrupt(SERIAL_BREAK_CALLBACK callback) {
+            if (callback == NULL)
+                return;
+
+            ucactl1 |= UCSWRST;
+            ucactl1 |= UCBRKIE;
+            breakcb = callback;
+            ucactl1 &= ~(UCSWRST);
+        };
+
+        virtual void detachBreakInterrupt(void) {
+            ucactl1 |= UCSWRST;
+            breakcb = NULL;
+            ucactl1 &= ~(UCBRKIE);
+            ucactl1 &= ~(UCSWRST);
+        };
 };
 
 
