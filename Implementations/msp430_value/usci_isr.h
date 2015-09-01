@@ -3,6 +3,8 @@
 #ifndef USCI_ISR_H
 #define USCI_ISR_H
 
+#include <UART_USCI_EXTISR.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
