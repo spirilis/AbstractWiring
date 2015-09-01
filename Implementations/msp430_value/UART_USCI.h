@@ -77,7 +77,6 @@ class UART_USCI : public UART_USCI_EXTISR {
         virtual void attachBreakInterrupt(SERIAL_BREAK_CALLBACK);
         virtual void detachBreakInterrupt(void);
 };
-    
 
 
 #endif /* UART_USCI_H */
