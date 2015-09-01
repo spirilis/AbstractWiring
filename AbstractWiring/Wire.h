@@ -3,7 +3,7 @@
 #ifndef WIRE_H_INCLUDED
 #define WIRE_H_INCLUDED
 
-#include <Arduino.h>
+#include <AbstractWiring.h>
 #include <Stream.h>
 
 

@@ -1,5 +1,5 @@
 
-#include <Arduino.h>
+#include <AbstractWiring.h>
 #include <IPAddress.h>
 
 

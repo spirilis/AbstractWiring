@@ -3,7 +3,7 @@
 #ifndef SPI_H_INCLUDED
 #define SPI_H_INCLUDED
 
-#include <Arduino.h>
+#include <AbstractWiring.h>
 
 /* Implementation-specific subclass should define the following features if implemented:
  *

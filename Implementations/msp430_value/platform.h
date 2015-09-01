@@ -35,8 +35,47 @@
 extern "C" {
 #endif
 
+void sysinit(unsigned long mclk);  // This implementation requires main() run sysinit() after DCO, BCSCTL1, BCSCTL2 and GIE are ready to roll.
+
 ALWAYS_INLINE void interrupts() { __bis_SR_register(GIE); }
 ALWAYS_INLINE void noInterrupts() { __bic_SR_register(GIE); }
+
+static const int P1_0 = 1;
+static const int P1_1 = 2;
+static const int P1_2 = 3;
+static const int P1_3 = 4;
+static const int P1_4 = 5;
+static const int P1_5 = 6;
+static const int P1_6 = 7;
+static const int P1_7 = 8;
+static const int P2_0 = 9;
+static const int P2_1 = 10;
+static const int P2_2 = 11;
+static const int P2_3 = 12;
+static const int P2_4 = 13;
+static const int P2_5 = 14;
+static const int P2_6 = 15;
+static const int P2_7 = 16;
+#ifdef __MSP430_HAS_PORT3_R__
+static const int P3_0 = 17;
+static const int P3_1 = 18;
+static const int P3_2 = 19;
+static const int P3_3 = 20;
+static const int P3_4 = 21;
+static const int P3_5 = 22;
+static const int P3_6 = 23;
+static const int P3_7 = 24;
+#ifdef __MSP430_HAS_PORT4_R__
+static const int P4_0 = 25;
+static const int P4_1 = 26;
+static const int P4_2 = 27;
+static const int P4_3 = 28;
+static const int P4_4 = 29;
+static const int P4_5 = 30;
+static const int P4_6 = 31;
+static const int P4_7 = 32;
+#endif
+#endif
 
 void pinMode(int, int);
 void digitalWrite(int, uint8_t);
@@ -56,6 +95,8 @@ void attachInterrupt(int, void (*)(void), int mode);
 void detachInterrupt(int);
 unsigned long micros();
 unsigned long millis();
+extern volatile uint32_t _sys_millis, _sys_micros;
+extern volatile boolean _sys_asleep;
 
 unsigned long pulseIn(int pin, uint8_t state, unsigned long timeout = 1000000L);
 void tone(int _pin, unsigned int frequency, unsigned long duration = 0);

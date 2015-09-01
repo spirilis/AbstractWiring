@@ -60,16 +60,8 @@ public:
 
     virtual size_t printTo(Print& p) const;
 
-    friend class EthernetClass;
-    friend class UDP;
     friend class Client;
     friend class Server;
-    friend class DhcpClass;
-    friend class DNSClient;
-    friend class WiFi;
-    friend class WiFiClient;
-    friend class WiFiServer;
-    friend class WiFiUDP;
 };
 
 extern const MACAddress MACADDR_NONE;
