@@ -45,6 +45,12 @@ class SPISettings {
             _bitorder = MSBFIRST;
             _datamode = SPI_MODE0;
         };
+
+        void copy(SPISettings s) {
+            _clock = s._clock;
+            _bitorder = s._bitorder;
+            _datamode = s._datamode;
+        };
 };
 
 class SPIClass {

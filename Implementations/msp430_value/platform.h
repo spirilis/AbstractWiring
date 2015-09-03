@@ -106,6 +106,8 @@ void wakeup(void);
 
 void attachInterrupt(int, void (*)(void), int mode);
 void detachInterrupt(int);
+void maskInterrupt(int);
+void unmaskInterrupt(int);
 unsigned long micros();
 unsigned long millis();
 extern volatile uint32_t _sys_millis;

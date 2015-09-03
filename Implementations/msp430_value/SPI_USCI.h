@@ -38,7 +38,9 @@ template <
 
 class SPI_USCI : public SPIClass {
     private:
-        SPISettings _settings;
+        SPISettings _settings, _settings_old;
+        int _mask_irq;
+        boolean _transaction_semaphore;
 
         uint8_t _derive_ctl0_bits(SPISettings & s) {
             uint8_t mode = _usci_spi_mode_bits[s._datamode];
@@ -97,6 +99,10 @@ class SPI_USCI : public SPIClass {
             set_pxsel(sclk_pxsel, sclk_pxsel2, sclk_pxsel_specification, sclk_pxbits);
             set_pxsel(mosi_pxsel, mosi_pxsel2, mosi_pxsel_specification, mosi_pxbits);
             set_pxsel(miso_pxsel, miso_pxsel2, miso_pxsel_specification, miso_pxbits);
+
+            ucxctl1 = UCSSEL_2;
+            _transaction_semaphore = false;
+            _mask_irq = 0;
         };
 
         void end(void) {
@@ -165,6 +171,58 @@ class SPI_USCI : public SPIClass {
             ucxbr1 = (uint8_t)clkdiv;
 
             ucxctl1 = (ucxctl1 & ~UCSWRST) | was_ucrst;
+        };
+
+        boolean beginTransaction(SPISettings settings) {
+            // For atomicity in semaphore check
+            __bic_SR_register(GIE);
+            if (_transaction_semaphore) {
+                __bis_SR_register(GIE);
+                return false;
+            }
+            _transaction_semaphore = true;
+            if (_mask_irq && _mask_irq != 255)
+                maskInterrupt(_mask_irq);
+            // Re-enable GIE but only if _mask_irq != 255
+            if (_mask_irq != 255)
+                __bis_SR_register(GIE);
+
+            _settings_old.copy(_settings);
+            _settings.copy(settings);
+
+            ucxctl1 |= UCSWRST;
+            ucxctl0 = _derive_ctl0_bits(_settings);
+            configClock(_settings._clock);
+            ucxctl1 &= ~UCSWRST;
+
+            return true;
+        };
+
+        void endTransaction(void) {
+            __bic_SR_register(GIE);
+            _transaction_semaphore = false;
+            if (_mask_irq && _mask_irq != 255)
+                unmaskInterrupt(_mask_irq);
+
+            // Restore SPI settings under GIE=0 protection in case an IRQ fires which uses SPI and expects
+            // the default SPISettings parameters to be active.
+            _settings.copy(_settings_old);
+            ucxctl1 |= UCSWRST;
+            ucxctl0 = _derive_ctl0_bits(_settings);
+            configClock(_settings._clock);
+            ucxctl1 &= ~UCSWRST;
+
+            __bis_SR_register(GIE);
+        };
+
+        void usingInterrupt(int pin) {
+            if (pin == 255) {
+                _mask_irq = 255;
+                return;
+            }
+            if (pin < 1 || pin > 16)
+                return;
+            _mask_irq = pin;
         };
 
 #ifdef SPI_ENABLE_EXTENDED_API

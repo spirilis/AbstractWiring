@@ -17,9 +17,11 @@ UART		:= uart
 UARTFILES	:= uart.cpp
 SPI		:= spi
 SPIFILES	:= spi.cpp
+SPITRANS	:= spitrans
+SPITRANSFILES	:= spitrans.cpp
 SRCFILES	:= ../*.cpp ../../../AbstractWiring/*.cpp
 
-all:		$(TEST).elf $(UART).elf $(SPI).elf
+all:		$(TEST).elf $(UART).elf $(SPI).elf $(SPITRANS).elf
 
 $(TEST).elf:
 	$(CXX) $(CFLAGS) -o $(TEST).elf $(SRCFILES) $(TESTFILES) $(LDFLAGS)
@@ -27,6 +29,8 @@ $(UART).elf:
 	$(CXX) $(CFLAGS) -o $(UART).elf $(SRCFILES) $(UARTFILES) $(LDFLAGS)
 $(SPI).elf:
 	$(CXX) $(CFLAGS) -o $(SPI).elf $(SRCFILES) $(SPIFILES) $(LDFLAGS)
+$(SPITRANS).elf:
+	$(CXX) $(CFLAGS) -o $(SPITRANS).elf $(SRCFILES) $(SPITRANSFILES) $(LDFLAGS)
 
 clean:
 	rm -f *.elf

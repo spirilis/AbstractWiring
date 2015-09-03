@@ -317,6 +317,39 @@ void detachInterrupt(int pin)
     return;
 }
 
+// maskInterrupt and unmaskInterrupt are used by SPI_USCI for usingInterrupt() Transaction support.
+void maskInterrupt(int pin)
+{
+    if (pin > 16)
+        return;
+
+    int pxidx = (pin - 1) % 8;
+    uint8_t pxbit = _bitvect[pxidx];
+
+    if (pin < 9) {
+        P1IE &= ~pxbit;
+        return;
+    }
+    P2IE &= ~pxbit;
+}
+
+void unmaskInterrupt(int pin)
+{
+    if (pin > 16)
+        return;
+
+    int pxidx = (pin - 1) % 8;
+    uint8_t pxbit = _bitvect[pxidx];
+
+    if (pin < 9) {
+        if (intVect_P1[pxidx] != NULL)
+            P1IE |= pxbit;
+        return;
+    }
+    if (intVect_P2[pxidx] != NULL)
+        P2IE |= pxbit;
+}
+
 __attribute__((interrupt(PORT1_VECTOR)))
 void P1_ISR(void)
 {
