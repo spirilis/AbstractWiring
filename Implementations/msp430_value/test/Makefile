@@ -15,14 +15,18 @@ TEST		:= test
 TESTFILES	:= test.cpp
 UART		:= uart
 UARTFILES	:= uart.cpp
+SPI		:= spi
+SPIFILES	:= spi.cpp
 SRCFILES	:= ../*.cpp ../../../AbstractWiring/*.cpp
 
-all:		$(TEST).elf $(UART).elf
+all:		$(TEST).elf $(UART).elf $(SPI).elf
 
 $(TEST).elf:
 	$(CXX) $(CFLAGS) -o $(TEST).elf $(SRCFILES) $(TESTFILES) $(LDFLAGS)
 $(UART).elf:
 	$(CXX) $(CFLAGS) -o $(UART).elf $(SRCFILES) $(UARTFILES) $(LDFLAGS)
+$(SPI).elf:
+	$(CXX) $(CFLAGS) -o $(SPI).elf $(SRCFILES) $(SPIFILES) $(LDFLAGS)
 
 clean:
 	rm -f *.elf

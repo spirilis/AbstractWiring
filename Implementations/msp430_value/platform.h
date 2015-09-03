@@ -30,6 +30,19 @@
 
 #define F_CPU 16000000L
 
+enum PortselMode {
+    PORT_SELECTION_NONE = 0,
+    PORT_SELECTION_0,
+    PORT_SELECTION_1,
+    PORT_SELECTION_0_AND_1
+};
+
+typedef const volatile uint8_t & u8_CSFR;
+typedef volatile uint8_t & u8_SFR;
+typedef const volatile uint16_t & u16_CSFR;
+typedef volatile uint16_t & u16_SFR;
+
+
 // C linkage (no function overloading)
 #ifdef __cplusplus
 extern "C" {
@@ -108,6 +121,8 @@ char * ltoa( long value, char *string, int radix ) ;
 char * utoa( unsigned long value, char *string, int radix ) ;
 char * ultoa( unsigned long value, char *string, int radix ) ;
 char * dtostrf (double val, signed char width, unsigned char prec, char *sout);
+
+void set_pxsel(u8_SFR, u8_SFR, enum PortselMode, uint8_t);
 
 #ifdef __cplusplus
 }; /* extern "C" */

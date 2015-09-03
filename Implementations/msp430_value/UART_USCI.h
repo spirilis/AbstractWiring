@@ -8,20 +8,8 @@
 #include <usci_isr.h>
 
 
-
-enum PortselMode {
-    PORT_SELECTION_NONE = 0,
-    PORT_SELECTION_0,
-    PORT_SELECTION_1,
-    PORT_SELECTION_0_AND_1
-};
-
-typedef const volatile uint8_t & u8_CSFR;
-typedef volatile uint8_t & u8_SFR;
-typedef const volatile uint16_t & u16_CSFR;
-typedef volatile uint16_t & u16_SFR;
-
 template <
+    int usci_a_instance,
     u8_SFR ucactl0,
     u8_SFR ucactl1,
     u8_SFR ucamctl,
@@ -55,7 +43,7 @@ class UART_USCI : public UART_USCI_EXTISR {
 
         virtual void begin(unsigned long bitrate) {
             usci_isr_installer();
-            isr_uscia0_uart_instance = this;
+            isr_usci_uart_instance[usci_a_instance] = this;
 
             _baud = bitrate;
             ucactl1 = UCSWRST;
@@ -66,27 +54,7 @@ class UART_USCI : public UART_USCI_EXTISR {
             configClock(bitrate);
 
             ucactl1 &= ~(UCSWRST);
-            switch (pxsel_specification) {
-                case PORT_SELECTION_NONE:
-                    pxsel &= ~pxbits;
-                    if (&pxsel2 != NULL)
-                        pxsel2 &= ~pxbits;
-                    break;
-                case PORT_SELECTION_0:
-                    pxsel |= pxbits;
-                    if (&pxsel2 != NULL)
-                        pxsel2 &= ~pxbits;
-                    break;
-                case PORT_SELECTION_1:
-                    pxsel &= ~pxbits;
-                    if (&pxsel2 != NULL)
-                        pxsel2 |= pxbits;
-                    break;
-                case PORT_SELECTION_0_AND_1:
-                    pxsel |= pxbits;
-                    if (&pxsel2 != NULL)
-                        pxsel2 |= pxbits;
-            }
+            set_pxsel(pxsel, pxsel2, pxsel_specification, pxbits);
             ucaie |= ucarxie;
 
             tx_head = 0;
@@ -97,8 +65,7 @@ class UART_USCI : public UART_USCI_EXTISR {
 
         virtual void end(void) {
             ucaie &= ~(ucatxie | ucarxie);
-            pxsel &= ~(pxbits);
-            pxsel2 &= ~(pxbits);
+            set_pxsel(pxsel, pxsel2, PORT_SELECTION_NONE, pxbits);
             ucactl1 |= UCSWRST;
 
             tx_head = 0;

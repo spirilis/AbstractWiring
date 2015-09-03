@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 void usci_isr_installer();
-extern UART_USCI_EXTISR *isr_uscia0_uart_instance;
+extern UART_USCI_EXTISR *isr_usci_uart_instance[];
 
 #ifdef __cplusplus
 };  /* extern "C" */

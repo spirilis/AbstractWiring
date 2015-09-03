@@ -1,14 +1,11 @@
 #include <AbstractWiring.h>
-#include <UART_USCI.h>
+#include <SPI_USCI.h>
 
 void myCallback(void);
 
 volatile boolean is_locked = false;
 
-char txbuf[16], rxbuf[16];
-
-UART_USCI <0, UCA0CTL0, UCA0CTL1, UCA0MCTL, UCA0ABCTL, UCA0BR0, UCA0BR1, UCA0STAT, UCA0TXBUF, UCA0RXBUF, IE2, UCA0TXIE, UCA0RXIE, txbuf, rxbuf, 16, 16, P1SEL, P1SEL2, PORT_SELECTION_0_AND_1, BIT1|BIT2> Serial;
-
+SPI_USCI<UCB0CTL0,UCB0CTL1,UCB0BR0,UCB0BR1,UCB0STAT,UCB0TXBUF,UCB0RXBUF,P1DIR,P1OUT,P1SEL,P1SEL2,BIT5,PORT_SELECTION_0_AND_1,P1DIR,P1OUT,P1SEL,P1SEL2,BIT7,PORT_SELECTION_0_AND_1,P1DIR,P1IN,P1SEL,P1SEL2,BIT6,PORT_SELECTION_0_AND_1> SPI;
 
 int main()
 {
@@ -19,21 +16,20 @@ int main()
 	BCSCTL1 = CALBC1_16MHZ;
 
 	sysinit(16000000UL);
-	Serial.begin(9600);
+	SPI.begin();
 
 	pinMode(4, INPUT_PULLUP);
 	attachInterrupt(4, myCallback, FALLING);
 	pinMode(1, OUTPUT);
 	digitalWrite(1, LOW);
 
-	int c;
-
 	while(1) {
-		if (Serial.available()) {
-			c = Serial.read();
-			if (c >= 0)
-				Serial.write(c);
-		}
+		SPI.transfer(0xAA);
+		delay(150);
+		SPI.transfer(0x82);
+		delay(150);
+		//SPI.transfer9(0x123);
+		//delay(150);
 	}
 	return 0;
 }

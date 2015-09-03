@@ -4,7 +4,7 @@
 #include <UART_USCI.h>
 
 
-UART_USCI_EXTISR *isr_uscia0_uart_instance = NULL;
+UART_USCI_EXTISR *isr_usci_uart_instance[1] = { NULL };
 
 extern "C" {
 
@@ -21,7 +21,7 @@ void USCIAB0_TX(void)
             // TODO
         } else {
             // UART
-            isr_uscia0_uart_instance->isr_send_char();
+            isr_usci_uart_instance[0]->isr_send_char();
         }
     }
 
@@ -50,7 +50,7 @@ void USCIAB0_RX(void)
             // TODO
         } else {
             // UART
-            isr_uscia0_uart_instance->isr_get_char();
+            isr_usci_uart_instance[0]->isr_get_char();
         }
     }
 

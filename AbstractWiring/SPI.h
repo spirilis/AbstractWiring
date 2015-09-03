@@ -29,26 +29,23 @@
 
 // SPISettings is required for transaction support, but your implementation of SPIClass can use it or ignore it.
 class SPISettings {
-    private:
+    public:
         uint32_t _clock;
         uint8_t _bitorder;
         uint8_t _datamode;
 
-        friend class SPIClass;
-
-    public:
         SPISettings(uint32_t clockrate, uint8_t bitorder, uint8_t datamode) {
             _clock = clockrate;
             _bitorder = bitorder;
             _datamode = datamode;
-        }
+        };
 
         SPISettings() {
             _clock = 4000000UL;
             _bitorder = MSBFIRST;
             _datamode = SPI_MODE0;
-        }
-}
+        };
+};
 
 class SPIClass {
     public:
@@ -56,16 +53,18 @@ class SPIClass {
         virtual void begin() = 0;
         virtual void end() = 0;
         virtual uint8_t transfer(uint8_t) = 0;
-        virtual void setBitOrder(enum bitorder) = 0;
-        virtual void setDataMode(enum datamode) = 0;
+        virtual void setBitOrder(unsigned int) = 0;
+        virtual void setDataMode(unsigned int) = 0;
         virtual void setClockDivider(int clockDiv) = 0;
         virtual void attachInterrupt() { };  // This doesn't do anything in Arduino anyhow
         virtual void detachInterrupt() { };  // This doesn't do anything in Arduino anyhow
 
-        // Extended API features; default implementation is null
-        virtual uint16_t transfer16(uint16_t) { };
-        virtual uint16_t transfer9(uint16_t) { };
-        virtual boolean beginTransaction(SPISettings settings) { };
+        // Extended API - optional - if implemented by subclass, override next function to return true
+        virtual boolean hasExtendedAPI(void) { return false; };
+
+        virtual uint16_t transfer16(uint16_t) { return 0; };
+        virtual uint16_t transfer9(uint16_t) { return 0; };
+        virtual boolean beginTransaction(SPISettings settings) { return false; };
         virtual void endTransaction(void) { };
         virtual void usingInterrupt(int pin) { };
 };
