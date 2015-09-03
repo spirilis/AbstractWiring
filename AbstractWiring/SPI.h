@@ -58,15 +58,15 @@ class SPIClass {
         virtual void setClockDivider(int clockDiv) = 0;
         virtual void attachInterrupt() { };  // This doesn't do anything in Arduino anyhow
         virtual void detachInterrupt() { };  // This doesn't do anything in Arduino anyhow
+        virtual boolean beginTransaction(SPISettings settings) = 0;
+        virtual void endTransaction(void) = 0;
+        virtual void usingInterrupt(int pin) = 0;
 
         // Extended API - optional - if implemented by subclass, override next function to return true
         virtual boolean hasExtendedAPI(void) { return false; };
 
         virtual uint16_t transfer16(uint16_t) { return 0; };
         virtual uint16_t transfer9(uint16_t) { return 0; };
-        virtual boolean beginTransaction(SPISettings settings) { return false; };
-        virtual void endTransaction(void) { };
-        virtual void usingInterrupt(int pin) { };
 };
 
 #endif /* SPI_H_INCLUDED */
