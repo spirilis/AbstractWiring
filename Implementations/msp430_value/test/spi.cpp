@@ -18,18 +18,23 @@ int main()
 	sysinit(16000000UL);
 	SPI.begin();
 
+	//SPI.setDataMode(SPI_MODE3);
+	//SPI.setBitOrder(LSBFIRST);
+
 	pinMode(4, INPUT_PULLUP);
 	attachInterrupt(4, myCallback, FALLING);
 	pinMode(1, OUTPUT);
 	digitalWrite(1, LOW);
 
 	while(1) {
-		SPI.transfer(0xAA);
-		delay(150);
-		SPI.transfer(0x82);
-		delay(150);
+		//SPI.transfer(0xAA);
+		//delay(150);
+		//SPI.transfer(0x82);
+		//delay(150);
 		//SPI.transfer9(0x123);
 		//delay(150);
+		SPI.transfer16(0x6933);
+		delay(150);
 	}
 	return 0;
 }

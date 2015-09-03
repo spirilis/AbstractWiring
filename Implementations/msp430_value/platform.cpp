@@ -568,23 +568,19 @@ void set_pxsel(u8_SFR sel, u8_SFR sel2, enum PortselMode mode, uint8_t bits) {
     switch (mode) {
         case PORT_SELECTION_NONE:
             sel &= ~bits;
-            if (&sel2 != NULL)
-                sel2 &= ~bits;
+            sel2 &= ~bits;
             break;
         case PORT_SELECTION_0:
             sel |= bits;
-            if (&sel2 != NULL)
-                sel2 &= ~bits;
+            sel2 &= ~bits;
             break;
         case PORT_SELECTION_1:
             sel &= ~bits;
-            if (&sel2 != NULL)
-                sel2 |= bits;
+            sel2 |= bits;
             break;
         case PORT_SELECTION_0_AND_1:
             sel |= bits;
-            if (&sel2 != NULL)
-                sel2 |= bits;
+            sel2 |= bits;
             break;
     }
 }

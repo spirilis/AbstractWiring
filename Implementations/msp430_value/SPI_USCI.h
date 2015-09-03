@@ -45,21 +45,20 @@ class SPI_USCI : public SPIClass {
         uint8_t _derive_ctl0_bits(SPISettings & s) {
             uint8_t mode = _usci_spi_mode_bits[s._datamode];
             uint8_t msb = (s._bitorder == MSBFIRST ? UCMSB : 0);
-            return msb | mode;
+            return UCMST | msb | mode;
         }
 
 #ifdef SPI_ENABLE_EXTENDED_API
         uint16_t _manual_9th_bit(uint16_t inw) {
             uint16_t retw = 0;
 
-            set_pxsel(sclk_pxsel, sclk_pxsel2, PORT_SELECTION_NONE, sclk_pxbits);
-            set_pxsel(mosi_pxsel, mosi_pxsel2, PORT_SELECTION_NONE, mosi_pxbits);
-            set_pxsel(miso_pxsel, miso_pxsel2, PORT_SELECTION_NONE, miso_pxbits);
             if (ucxctl0 & UCCKPL)
                 sclk_pxout |= sclk_pxbits;
             else
                 sclk_pxout &= ~sclk_pxbits;
             sclk_pxdir |= sclk_pxbits;
+            set_pxsel(sclk_pxsel, sclk_pxsel2, PORT_SELECTION_NONE, sclk_pxbits);
+
             if (ucxctl0 & UCCKPH) {
                 if (inw & 0x100)
                     mosi_pxout |= mosi_pxbits;
@@ -67,10 +66,16 @@ class SPI_USCI : public SPIClass {
                     mosi_pxout &= ~mosi_pxbits;
                 mosi_pxdir |= mosi_pxbits;
                 miso_pxdir &= ~miso_pxbits;
+                set_pxsel(mosi_pxsel, mosi_pxsel2, PORT_SELECTION_NONE, mosi_pxbits);
+                set_pxsel(miso_pxsel, miso_pxsel2, PORT_SELECTION_NONE, miso_pxbits);
+
                 sclk_pxout ^= sclk_pxbits;
                 if (miso_pxin & miso_pxbits)
                     retw = 0x100;
-                sclk_pxout ^= sclk_pxbits;
+                set_pxsel(sclk_pxsel, sclk_pxsel2, sclk_pxsel_specification, sclk_pxbits);
+                // ^ I found by experimentation with the logic analyzer that the "best" way to
+                // release SCLK to its resting state is just to hand control back to USCI ... otherwise
+                // a 2nd "phantom SCLK pulse" results between the XOR and the pxsel setting.
             } else {
                 sclk_pxout ^= sclk_pxbits;
                 if (inw & 0x100)
@@ -79,11 +84,13 @@ class SPI_USCI : public SPIClass {
                     mosi_pxout &= ~mosi_pxbits;
                 mosi_pxdir |= mosi_pxbits;
                 miso_pxdir &= ~miso_pxbits;
-                sclk_pxout ^= sclk_pxbits;
+                set_pxsel(mosi_pxsel, mosi_pxsel2, PORT_SELECTION_NONE, mosi_pxbits);
+                set_pxsel(miso_pxsel, miso_pxsel2, PORT_SELECTION_NONE, miso_pxbits);
+
+                set_pxsel(sclk_pxsel, sclk_pxsel2, sclk_pxsel_specification, sclk_pxbits);
                 if (miso_pxin & miso_pxbits)
                     retw = 0x100;
             }
-            set_pxsel(sclk_pxsel, sclk_pxsel2, sclk_pxsel_specification, sclk_pxbits);
             set_pxsel(mosi_pxsel, mosi_pxsel2, mosi_pxsel_specification, mosi_pxbits);
             set_pxsel(miso_pxsel, miso_pxsel2, miso_pxsel_specification, miso_pxbits);
             return retw;
@@ -134,7 +141,7 @@ class SPI_USCI : public SPIClass {
         };
 
         void setDataMode(unsigned int mode) {
-            _settings._bitorder = mode;
+            _settings._datamode = mode;
 
             uint8_t was_ucrst = ucxctl1 & UCSWRST;
             ucxctl1 |= UCSWRST;
