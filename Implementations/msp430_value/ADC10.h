@@ -46,6 +46,11 @@ class ADC10 {
         };
 
         NEVER_INLINE
+        void useCalibration(boolean yesno) {
+            use_calibration = yesno;
+        };
+
+        NEVER_INLINE
         void setReference(enum AdcVRef vref) {
             switch (vref) {
                 case DEFAULT:
