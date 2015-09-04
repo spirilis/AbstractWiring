@@ -19,9 +19,12 @@ SPI		:= spi
 SPIFILES	:= spi.cpp
 SPITRANS	:= spitrans
 SPITRANSFILES	:= spitrans.cpp
+TEMPSENSOR	:= tempsensor
+TEMPSENSORFILES	:= tempsensor.cpp
+
 SRCFILES	:= ../*.cpp ../../../AbstractWiring/*.cpp
 
-all:		$(TEST).elf $(UART).elf $(SPI).elf $(SPITRANS).elf
+all:		$(TEST).elf $(UART).elf $(SPI).elf $(SPITRANS).elf $(TEMPSENSOR).elf
 
 $(TEST).elf:
 	$(CXX) $(CFLAGS) -o $(TEST).elf $(SRCFILES) $(TESTFILES) $(LDFLAGS)
@@ -31,6 +34,8 @@ $(SPI).elf:
 	$(CXX) $(CFLAGS) -DSPI_ENABLE_EXTENDED_API -o $(SPI).elf $(SRCFILES) $(SPIFILES) $(LDFLAGS)
 $(SPITRANS).elf:
 	$(CXX) $(CFLAGS) -o $(SPITRANS).elf $(SRCFILES) $(SPITRANSFILES) $(LDFLAGS)
+$(TEMPSENSOR).elf:
+	$(CXX) $(CFLAGS) -o $(TEMPSENSOR).elf $(SRCFILES) $(TEMPSENSORFILES) $(LDFLAGS)
 
 clean:
 	rm -f *.elf

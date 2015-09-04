@@ -49,6 +49,7 @@ class SPI_USCI : public SPIClass {
         }
 
 #ifdef SPI_ENABLE_EXTENDED_API
+        NEVER_INLINE
         uint16_t _manual_9th_bit(uint16_t inw) {
             uint16_t retw = 0;
 
@@ -98,6 +99,7 @@ class SPI_USCI : public SPIClass {
 #endif /* SPI_ENABLE_EXTENDED_API */
 
     public:
+        NEVER_INLINE
         void begin(void) {
             ucxctl1 |= UCSWRST;
             ucxctl0 = _derive_ctl0_bits(_settings);
@@ -112,6 +114,7 @@ class SPI_USCI : public SPIClass {
             _mask_irq = 0;
         };
 
+        NEVER_INLINE
         void end(void) {
             ucxctl1 |= UCSWRST;
             ucxctl0 &= ~UCSYNC;
@@ -129,6 +132,7 @@ class SPI_USCI : public SPIClass {
             return ucxrxbuf;
         };
 
+        NEVER_INLINE
         void setBitOrder(unsigned int msblsb) {
             _settings._bitorder = msblsb;
 
@@ -140,6 +144,7 @@ class SPI_USCI : public SPIClass {
             ucxctl1 = (ucxctl1 & ~UCSWRST) | was_ucrst;
         };
 
+        NEVER_INLINE
         void setDataMode(unsigned int mode) {
             _settings._datamode = mode;
 
@@ -151,11 +156,13 @@ class SPI_USCI : public SPIClass {
             ucxctl1 = (ucxctl1 & ~UCSWRST) | was_ucrst;
         };
 
+        NEVER_INLINE
         void setClockDivider(int clockDiv) {
             _settings._clock = 16000000UL / clockDiv;  // Clock div is referenced from Arduino, dividing 16MHz
             configClock(_settings._clock);
         };
 
+        NEVER_INLINE
         void configClock(unsigned long bitrate) {
             uint32_t smclk = F_CPU;
             uint16_t clkdiv = smclk / bitrate;
@@ -180,6 +187,7 @@ class SPI_USCI : public SPIClass {
             ucxctl1 = (ucxctl1 & ~UCSWRST) | was_ucrst;
         };
 
+        NEVER_INLINE
         boolean beginTransaction(SPISettings settings) {
             // For atomicity in semaphore check
             __bic_SR_register(GIE);
@@ -205,6 +213,7 @@ class SPI_USCI : public SPIClass {
             return true;
         };
 
+        NEVER_INLINE
         void endTransaction(void) {
             __bic_SR_register(GIE);
             _transaction_semaphore = false;
@@ -222,6 +231,7 @@ class SPI_USCI : public SPIClass {
             __bis_SR_register(GIE);
         };
 
+        NEVER_INLINE
         void usingInterrupt(int pin) {
             if (pin == 255) {
                 _mask_irq = 255;
@@ -235,6 +245,7 @@ class SPI_USCI : public SPIClass {
 #ifdef SPI_ENABLE_EXTENDED_API
         boolean hasExtendedAPI(void) { return true; };
 
+        NEVER_INLINE
         uint16_t transfer16(uint16_t inw) {
             uint16_t retw;
 
@@ -279,6 +290,7 @@ class SPI_USCI : public SPIClass {
             return retw;
         };
 
+        NEVER_INLINE
         uint16_t transfer9(uint16_t inw) {
             uint16_t retw;
             while (ucxstat & UCBUSY)

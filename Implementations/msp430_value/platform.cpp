@@ -14,7 +14,7 @@ enum msp430_sfr {
 };
 
 // avoid bitshifts with this
-static uint8_t _bitvect[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+uint8_t _bitvect[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
 
 // This stuff would normally be split out into a pins.h or pins.c file (e.g. pins_energia.h from Energia)

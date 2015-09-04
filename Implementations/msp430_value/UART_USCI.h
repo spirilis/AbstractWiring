@@ -41,7 +41,8 @@ class UART_USCI : public UART_USCI_EXTISR {
     public:
         UART_USCI() { ; };
 
-        virtual void begin(unsigned long bitrate) {
+	NEVER_INLINE
+        void begin(unsigned long bitrate) {
             usci_isr_installer();
             isr_usci_uart_instance[usci_a_instance] = this;
 
@@ -63,7 +64,8 @@ class UART_USCI : public UART_USCI_EXTISR {
             rx_tail = 0;
     	};
 
-        virtual void end(void) {
+	NEVER_INLINE
+        void end(void) {
             ucaie &= ~(ucatxie | ucarxie);
             set_pxsel(pxsel, pxsel2, PORT_SELECTION_NONE, pxbits);
             ucactl1 |= UCSWRST;
@@ -74,10 +76,11 @@ class UART_USCI : public UART_USCI_EXTISR {
             rx_tail = 0;
         };
 
-        virtual int available(void) { return (rx_buffer_size + rx_head - rx_tail) % rx_buffer_size; };
-        virtual int peek(void) { if (rx_head == rx_tail) return -1; return rxbuffer[rx_tail]; };
+        int available(void) { return (rx_buffer_size + rx_head - rx_tail) % rx_buffer_size; };
+        int peek(void) { if (rx_head == rx_tail) return -1; return rxbuffer[rx_tail]; };
 
-        virtual int read(void) {
+	NEVER_INLINE
+        int read(void) {
             if (rx_head == rx_tail)
                 return -1;
 
@@ -86,9 +89,10 @@ class UART_USCI : public UART_USCI_EXTISR {
             return c;
         };
 
-        virtual void flush(void) { while (tx_head != tx_tail) ; };
+        void flush(void) { while (tx_head != tx_tail) ; };
 
-        virtual size_t write(uint8_t c) {
+	NEVER_INLINE
+        size_t write(uint8_t c) {
             unsigned int i = (tx_head + 1) % tx_buffer_size;
 
             // If the output buffer is full, we must wait.
@@ -114,6 +118,7 @@ class UART_USCI : public UART_USCI_EXTISR {
 
         operator bool() { if (ucactl1 & UCSWRST) return false; return true; };
 
+	NEVER_INLINE
         void isr_send_char(void) {
             if (tx_head == tx_tail) {
                 // Buffer empty; disable interrupts
@@ -128,6 +133,7 @@ class UART_USCI : public UART_USCI_EXTISR {
             ucatxbuf = c;
         };
 
+	NEVER_INLINE
         void isr_get_char(void) {
             uint8_t c = ucarxbuf;
             unsigned int i = (rx_head + 1) % rx_buffer_size;
@@ -138,6 +144,7 @@ class UART_USCI : public UART_USCI_EXTISR {
             }   // else ... ignore the char (buffer full)
         };
 
+	NEVER_INLINE
         void configClock(unsigned long bitrate) {
             uint16_t mod;
             uint32_t divider;
@@ -163,9 +170,10 @@ class UART_USCI : public UART_USCI_EXTISR {
         };
 
         // Optional API is implemented
-        virtual boolean hasExtendedAPI(void) { return true; };
+        boolean hasExtendedAPI(void) { return true; };
 
-        virtual void set7Bit(boolean yn) {
+	NEVER_INLINE
+        void set7Bit(boolean yn) {
             ucactl1 |= UCSWRST;
             if (yn)
                 ucactl0 |= UC7BIT;
@@ -174,7 +182,8 @@ class UART_USCI : public UART_USCI_EXTISR {
             ucactl1 &= ~(UCSWRST);
         };
 
-        virtual void setStopBits(int s) {
+	NEVER_INLINE
+        void setStopBits(int s) {
             if (s < 1 || s > 2)
                 return;
             ucactl1 |= UCSWRST;
@@ -185,7 +194,8 @@ class UART_USCI : public UART_USCI_EXTISR {
             ucactl1 &= ~(UCSWRST);
         };
 
-        virtual void setParity(enum SerialParity setting) {
+	NEVER_INLINE
+        void setParity(enum SerialParity setting) {
             ucactl1 |= UCSWRST;
             switch (setting) {
                 case PARITY_NONE:
@@ -202,7 +212,8 @@ class UART_USCI : public UART_USCI_EXTISR {
             ucactl1 &= ~(UCSWRST);
         };
 
-        virtual void sendBreak(void) {
+	NEVER_INLINE
+        void sendBreak(void) {
             if (ucactl1 & UCSWRST)
                 return;
 
@@ -217,7 +228,8 @@ class UART_USCI : public UART_USCI_EXTISR {
             ucaie |= txie_save;
         };
 
-        virtual void attachBreakInterrupt(SERIAL_BREAK_CALLBACK callback) {
+	NEVER_INLINE
+        void attachBreakInterrupt(SERIAL_BREAK_CALLBACK callback) {
             if (callback == NULL)
                 return;
 
@@ -227,7 +239,8 @@ class UART_USCI : public UART_USCI_EXTISR {
             ucactl1 &= ~(UCSWRST);
         };
 
-        virtual void detachBreakInterrupt(void) {
+	NEVER_INLINE
+        void detachBreakInterrupt(void) {
             ucactl1 |= UCSWRST;
             breakcb = NULL;
             ucactl1 &= ~(UCBRKIE);
