@@ -5,6 +5,7 @@
 
 
 UART_USCI_EXTISR *isr_usci_uart_instance[1] = { NULL };
+TwoWire_USCI_EXTISR *isr_usci_twowire_instance[1] = { NULL };
 
 extern "C" {
 
@@ -25,11 +26,13 @@ void USCIAB0_TX(void)
         }
     }
 
-    if (IFG2 & UCB0TXIFG) {
-        if ( (UCB0CTL0 & UCMODE_3) == UCMODE_3 ) {
+    if ( (UCB0CTL0 & UCMODE) == UCMODE_3 ) {
+        if (IFG2 & (UCB0TXIFG | UCB0RXIFG)) {
             // I2C
-            // TODO
-        } else {
+            isr_usci_twowire_instance[0]->isr_handle_txrx();
+        }
+    } else {
+        if (IFG2 & UCB0TXIFG) {
             // SPI Slave
             // TODO
         }
@@ -51,6 +54,18 @@ void USCIAB0_RX(void)
         } else {
             // UART
             isr_usci_uart_instance[0]->isr_get_char();
+        }
+    }
+
+    if ( (UCB0CTL0 & UCMODE) == UCMODE_3 ) {
+        if (UCB0STAT & (UCNACKIFG | UCSTPIFG | UCSTTIFG | UCALIFG)) {
+            // I2C
+            isr_usci_twowire_instance[0]->isr_handle_control();
+        }
+    } else {
+        if (IFG2 & UCB0RXIFG) {
+            // SPI Slave Mode
+            // TODO
         }
     }
 

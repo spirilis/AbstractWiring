@@ -42,6 +42,6 @@ class TwoWire : public Stream {
 
         virtual void onReceive(TWOWIRE_SLAVE_RX_CALLBACK) = 0;
         virtual void onRequest(TWOWIRE_SLAVE_TX_CALLBACK) = 0;
-}
+};
 
 #endif /* WIRE_H_INCLUDED */
