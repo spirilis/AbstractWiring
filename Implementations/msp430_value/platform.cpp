@@ -2,6 +2,10 @@
 
 #include <Arduino.h>
 #include <s_printf.h>
+#include <ADC10.h>
+
+// ADC instance
+ADC10 adc;
 
 // C linkage
 extern "C" {
@@ -192,16 +196,17 @@ int digitalRead(int pin)
         return LOW;
 }
 
-uint16_t analogRead(int pin)
+uint16_t analogRead(int channel)
 {
-	return 0;
+    return adc.sample(channel);
+}
+
+void analogReference(enum AdcVRef ref)
+{
+    adc.setReference(ref);
 }
 
 void analogWrite(int pin, int pwmvalue)
-{
-}
-
-void analogReference(int vref)
 {
 }
 
@@ -545,6 +550,12 @@ void watchdog_isr (void)
     _sys_micros = f;
 
     /* Exit from LPM on reti */
+    __bic_SR_register_on_exit(LPM4_bits);
+}
+
+__attribute__((interrupt(ADC10_VECTOR)))
+void ADC10_ISR(void)
+{
     __bic_SR_register_on_exit(LPM4_bits);
 }
 

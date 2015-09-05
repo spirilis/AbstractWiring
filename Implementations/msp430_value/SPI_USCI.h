@@ -3,7 +3,6 @@
 #ifndef SPI_USCI_H
 #define SPI_USCI_H
 
-
 #include <AbstractWiring.h>
 #include <SPI.h>
 

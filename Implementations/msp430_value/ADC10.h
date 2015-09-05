@@ -71,7 +71,7 @@ class ADC10 {
                     ADC10CTL0 = (ADC10CTL0 & ~(SREF_7 | REFBURST)) | SREF_1 | REFON | REFOUT | REF2_5V;
                     break;
                 case EXTERNAL:
-                    ADC10CTL0 = (ADC10CTL0 & ~(SREF_7 | REFBURST | REFOUT | REFON | REF2_5V)) | SREF_3;
+                    ADC10CTL0 = (ADC10CTL0 & ~(SREF_7 | REFBURST | REFOUT | REFON | REF2_5V)) | SREF_2;
             }
             voltage_reference = vref;
         };
@@ -120,13 +120,18 @@ class ADC10 {
                 return 0;  // not available on MSP430 value-line chips
 
             // Configure channel
-            ADC10CTL1 = channel * 0x1000;
+            ADC10CTL1 = channel * INCH0 | ADC10DIV_1;
             if (channel < 8)
                 ADC10AE0 = _bitvect[channel];
             // Start conversion (SHT=01, 8xADC10CLK's sample & hold)
-            ADC10CTL0 = (ADC10CTL0 & (SREF_7 | REFOUT | REFBURST | REFON | REF2_5V)) | ADC10SHT_1 | ADC10ON | ENC | ADC10SC;  // Begin!
+            ADC10CTL0 = (ADC10CTL0 & (SREF_7 | REFOUT | REFBURST | REFON | REF2_5V)) | ADC10SHT_2 | ADC10ON;  // Enable REF if used
+            if (ADC10CTL0 & REFON)
+                __delay_cycles(64);  // VRef settling time
+
+            // Begin conversion
+            ADC10CTL0 |= ENC | ADC10SC;
             while (ADC10CTL1 & ADC10BUSY)
-                ;
+                LPM0;
             uint16_t res = ADC10MEM;
             ADC10AE0 = 0x00;
 
@@ -138,18 +143,26 @@ class ADC10 {
         };
 
         NEVER_INLINE
-        int16_t sample_tempsensor(void) {
-            ADC10CTL1 = 10;
-            ADC10CTL0 = SREF_1 | ADC10SHT_3 | REF2_5V | REFON | ADC10ON | ENC | ADC10SC;
-            while (ADC10CTL1 & ADC10BUSY)
-                ;
-            uint16_t res = ADC10MEM;
-            ADC10CTL0 &= ~(ADC10ON | ENC);
+        int16_t sample_tempsensor() {
+            ADC10CTL1 = (uint16_t)10 * INCH0 | ADC10DIV_4;
+            ADC10CTL0 = SREF_1 | ADC10SHT_3 | REF2_5V | REFON | ADC10ON | ADC10IE;
+            __delay_cycles(64);  // wait for VRef to settle
+
+            uint16_t res = 0, i = 0;
+            for (i = 0; i < 8; i++) {
+                ADC10CTL0 |= ENC | ADC10SC;
+                while (ADC10CTL1 & ADC10BUSY)
+                    LPM0;
+                res += ADC10MEM;
+                __delay_cycles(16);
+            }
+            ADC10CTL0 &= ~(REFON | ADC10ON | ENC);
+            res >>= 3;
 
             // Perform temperature-compensation
             #if defined(TLV_ADC10_1_TAG_) && defined(CAL_ADC_25T30) && defined(CAL_ADC_25T85)
-            uint32_t cal_t30 = *( (const volatile uint16_t *)TLV_ADC10_1_TAG_ + 1 + CAL_ADC_25T30 );
-            uint32_t cal_t85 = *( (const volatile uint16_t *)TLV_ADC10_1_TAG_ + 1 + CAL_ADC_25T85 );
+            uint16_t cal_t30 = *( (const volatile uint16_t *)TLV_ADC10_1_TAG_ + 1 + CAL_ADC_25T30 );
+            uint16_t cal_t85 = *( (const volatile uint16_t *)TLV_ADC10_1_TAG_ + 1 + CAL_ADC_25T85 );
 
             int32_t intermediate = res;
             intermediate -= cal_t30;

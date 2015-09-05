@@ -42,7 +42,6 @@ typedef volatile uint8_t & u8_SFR;
 typedef const volatile unsigned int & u16_CSFR;
 typedef volatile unsigned int & u16_SFR;
 
-
 // C linkage (no function overloading)
 #ifdef __cplusplus
 extern "C" {
@@ -93,9 +92,7 @@ static const int P4_7 = 32;
 void pinMode(int, int);
 void digitalWrite(int, uint8_t);
 int digitalRead(int);
-uint16_t analogRead(int);
 void analogWrite(int, int);
-void analogReference(int);
 void analogFrequency(uint16_t);
 
 void delay(uint32_t milliseconds);
@@ -137,6 +134,18 @@ void set_pxsel(u8_SFR, u8_SFR, enum PortselMode, uint8_t);
 uint16_t makeWord(uint16_t);
 uint16_t makeWord(uint8_t, uint8_t);
 
+// Analog sampling (ADC)
+#include <ADC10.h>
+extern ADC10 adc;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+uint16_t analogRead(int channel);
+void analogReference(enum AdcVRef ref);
+#ifdef __cplusplus
+}; /* extern "C" */
+#endif
 
 
 #endif

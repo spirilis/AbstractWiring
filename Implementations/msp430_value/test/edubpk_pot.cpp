@@ -21,16 +21,14 @@ int main()
 	sysinit(16000000UL);
 	Serial.begin(9600);
 
-	pinMode(4, INPUT_PULLUP);
-	attachInterrupt(4, myCallback, FALLING);
+	// Can't use pin 4 (P1.3) here 'cause it's the ADC we're trying to sample!
+	//pinMode(4, INPUT_PULLUP);
+	//attachInterrupt(4, myCallback, FALLING);
 	pinMode(1, OUTPUT);
 	digitalWrite(1, LOW);
 
-	while (!is_ready)  // wait for user to press button to begin
-		;
-
 	int c;
-	uint32_t millis_next = 0;
+	uint32_t millis_next = millis() + 2000;
 
 	while(1) {
 		if (Serial.available()) {
@@ -40,11 +38,9 @@ int main()
 		}
 		if (millis() > millis_next) {
 			millis_next = millis() + 2000;
-			Serial.print("Temperature (degrees Celsius): ");
-			Serial.println(adc.sample_tempsensor());
+			Serial.print("Potentiometer: ");
+			Serial.println(analogRead(3));  // A3 = P1.3 = EduBPak Pot or Accel_Y
 		}
-
-		adc.sample(0);  // sample A0
 	}
 	return 0;
 }

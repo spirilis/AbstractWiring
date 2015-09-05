@@ -123,11 +123,9 @@ class UART_USCI : public UART_USCI_EXTISR {
             if (tx_head == tx_tail) {
                 // Buffer empty; disable interrupts
                 ucaie &= ~ucatxie;
-                P1OUT &= ~BIT0;
                 return;
             }
 
-            P1OUT |= BIT0;
             uint8_t c = txbuffer[tx_tail];
             tx_tail = (tx_tail + 1) % tx_buffer_size;
             ucatxbuf = c;
