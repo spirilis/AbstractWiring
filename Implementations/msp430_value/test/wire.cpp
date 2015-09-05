@@ -24,7 +24,7 @@ int main()
 	digitalWrite(1, LOW);
 
 	while(1) {
-		Wire.beginTransmission(0x29);
+		Wire.beginTransmission(0x28);
 		Wire.print("Hi there");
 		if (Wire.endTransmission())
 			digitalWrite(1, HIGH);

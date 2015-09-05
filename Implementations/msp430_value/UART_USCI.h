@@ -22,8 +22,6 @@ template <
     u8_SFR ucaie,
     uint8_t ucatxie,
     uint8_t ucarxie,
-    volatile char * txbuffer,
-    volatile char * rxbuffer,
     size_t tx_buffer_size,
     size_t rx_buffer_size,
     u8_SFR pxsel,
@@ -33,6 +31,7 @@ template <
 
 class UART_USCI : public UART_USCI_EXTISR {
     private:
+	volatile char txbuffer[tx_buffer_size], rxbuffer[rx_buffer_size];
         volatile unsigned int tx_head, tx_tail;
         volatile unsigned int rx_head, rx_tail;
         unsigned long _baud;

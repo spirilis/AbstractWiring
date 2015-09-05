@@ -390,7 +390,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
                     ucbctl0 &= ~UCMST;
                     ucbctl1 &= ~UCSWRST;  // Restore slave mode functionality
                 }
-                return false;
+                return 0;
             }
 
             if (len == 1)

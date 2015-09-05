@@ -25,10 +25,12 @@ EDUBPK_POT	:= edubpk_pot
 EDUBPK_POTFILES	:= edubpk_pot.cpp
 WIRE		:= wire
 WIREFILES	:= wire.cpp
+WIRE_RW		:= wire_rw
+WIRE_RWFILES	:= wire_rw.cpp
 
 SRCFILES	:= ../*.cpp ../../../AbstractWiring/*.cpp
 
-all:		$(TEST).elf $(UART).elf $(SPI).elf $(SPITRANS).elf $(TEMPSENSOR).elf $(EDUBPK_POT).elf $(WIRE).elf
+all:		$(TEST).elf $(UART).elf $(SPI).elf $(SPITRANS).elf $(TEMPSENSOR).elf $(EDUBPK_POT).elf $(WIRE).elf $(WIRE_RW).elf
 
 $(TEST).elf:
 	$(CXX) $(CFLAGS) -o $(TEST).elf $(SRCFILES) $(TESTFILES) $(LDFLAGS)
@@ -44,6 +46,8 @@ $(EDUBPK_POT).elf:
 	$(CXX) $(CFLAGS) -o $(EDUBPK_POT).elf $(SRCFILES) $(EDUBPK_POTFILES) $(LDFLAGS)
 $(WIRE).elf:
 	$(CXX) $(CFLAGS) -o $(WIRE).elf $(SRCFILES) $(WIREFILES) $(LDFLAGS)
+$(WIRE_RW).elf:
+	$(CXX) $(CFLAGS) -o $(WIRE_RW).elf $(SRCFILES) $(WIRE_RWFILES) $(LDFLAGS)
 
 clean:
 	rm -f *.elf
