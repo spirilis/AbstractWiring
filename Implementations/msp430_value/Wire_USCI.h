@@ -27,7 +27,7 @@ enum USCI_TwoWire_error {
 
 
 template <
-    unsigned int periphidx,
+    unsigned int usci_b_instance,
     u8_SFR ucbctl0,
     u8_SFR ucbctl1,
     u8_SFR ucbbr0,
@@ -62,7 +62,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
     public:
         NEVER_INLINE
         Wire_USCI() {
-            isr_usci_twowire_instance[periphidx] = this;
+            isr_usci_twowire_instance[usci_b_instance] = this;
             stx_callback = NULL;
             srx_callback = NULL;
             twi_state = TWI_IDLE;
