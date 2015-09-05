@@ -1,7 +1,8 @@
 /* USCI ISRs for MSP430G2xxx devices */
 
 #include <AbstractWiring.h>
-#include <UART_USCI.h>
+#include <UART_USCI_EXTISR.h>
+#include <TwoWire_USCI_EXTISR.h>
 
 
 UART_USCI_EXTISR *isr_usci_uart_instance[1] = { NULL };
@@ -26,10 +27,11 @@ void USCIAB0_TX(void)
         }
     }
 
-    if ( (UCB0CTL0 & UCMODE) == UCMODE_3 ) {
+    if ( (UCB0CTL0 & UCMODE_3) == UCMODE_3 ) {
         if (IFG2 & (UCB0TXIFG | UCB0RXIFG)) {
             // I2C
-            isr_usci_twowire_instance[0]->isr_handle_txrx();
+            if (isr_usci_twowire_instance[0]->isr_handle_txrx())
+                __bic_SR_register_on_exit(LPM4_bits);
         }
     } else {
         if (IFG2 & UCB0TXIFG) {
@@ -57,10 +59,11 @@ void USCIAB0_RX(void)
         }
     }
 
-    if ( (UCB0CTL0 & UCMODE) == UCMODE_3 ) {
+    if ( (UCB0CTL0 & UCMODE_3) == UCMODE_3 ) {
         if (UCB0STAT & (UCNACKIFG | UCSTPIFG | UCSTTIFG | UCALIFG)) {
             // I2C
-            isr_usci_twowire_instance[0]->isr_handle_control();
+            if (isr_usci_twowire_instance[0]->isr_handle_control())
+                __bic_SR_register_on_exit(LPM4_bits);
         }
     } else {
         if (IFG2 & UCB0RXIFG) {

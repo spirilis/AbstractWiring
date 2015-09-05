@@ -39,8 +39,8 @@ enum PortselMode {
 
 typedef const volatile uint8_t & u8_CSFR;
 typedef volatile uint8_t & u8_SFR;
-typedef const volatile uint16_t & u16_CSFR;
-typedef volatile uint16_t & u16_SFR;
+typedef const volatile unsigned int & u16_CSFR;
+typedef volatile unsigned int & u16_SFR;
 
 
 // C linkage (no function overloading)

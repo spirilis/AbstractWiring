@@ -15,23 +15,25 @@ class TwoWire : public Stream {
     public:
         virtual void begin(void) = 0;
         virtual void begin(uint8_t) = 0;
-        virtual void begin(int addr) = { begin((uint8_t) addr); };  // Override for >8-bit I2C addresses
+        virtual void begin(int addr) { begin((uint8_t) addr); };  // Override for >8-bit I2C addresses
 
         virtual void end(void) = 0;
 
         virtual void beginTransmission(uint8_t) = 0;
-        virtual void beginTransmission(int addr) { beginTransmission((uint8_t *)addr); };  // Override for >8-bit I2C addresses
+        virtual void beginTransmission(int addr) { beginTransmission((uint8_t)addr); };  // Override for >8-bit I2C addresses
         virtual boolean endTransmission(void);
 
         virtual uint8_t requestFrom(uint8_t addr, uint8_t len) = 0;
-        virtual uint8_t requestFrom(int addr, int len) { return requestFrom((uint8_t)addr, (uint8_t)len); };  // Override for >8-bit I2C addresses
+        virtual int requestFrom(int addr, int len) { return requestFrom((uint8_t)addr, (uint8_t)len); };  // Override for >8-bit I2C addresses
 
         virtual size_t write(uint8_t) = 0;
         virtual size_t write(const uint8_t *buf, size_t len) {
-            int x = 0;
+            size_t x = 0;
             for (x=0; x < len; x++) {
-                write(buf[x]);
+                if (write(buf[x]) == 0)
+                    return x;
             }
+            return x;
         };
 
         virtual int available(void) = 0;

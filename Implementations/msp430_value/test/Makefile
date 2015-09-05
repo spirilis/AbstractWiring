@@ -21,10 +21,12 @@ SPITRANS	:= spitrans
 SPITRANSFILES	:= spitrans.cpp
 TEMPSENSOR	:= tempsensor
 TEMPSENSORFILES	:= tempsensor.cpp
+WIRE		:= wire
+WIREFILES	:= wire.cpp
 
 SRCFILES	:= ../*.cpp ../../../AbstractWiring/*.cpp
 
-all:		$(TEST).elf $(UART).elf $(SPI).elf $(SPITRANS).elf $(TEMPSENSOR).elf
+all:		$(TEST).elf $(UART).elf $(SPI).elf $(SPITRANS).elf $(TEMPSENSOR).elf $(WIRE).elf
 
 $(TEST).elf:
 	$(CXX) $(CFLAGS) -o $(TEST).elf $(SRCFILES) $(TESTFILES) $(LDFLAGS)
@@ -36,6 +38,8 @@ $(SPITRANS).elf:
 	$(CXX) $(CFLAGS) -o $(SPITRANS).elf $(SRCFILES) $(SPITRANSFILES) $(LDFLAGS)
 $(TEMPSENSOR).elf:
 	$(CXX) $(CFLAGS) -o $(TEMPSENSOR).elf $(SRCFILES) $(TEMPSENSORFILES) $(LDFLAGS)
+$(WIRE).elf:
+	$(CXX) $(CFLAGS) -o $(WIRE).elf $(SRCFILES) $(WIREFILES) $(LDFLAGS)
 
 clean:
 	rm -f *.elf
