@@ -38,12 +38,13 @@ class UART_USCI : public UART_USCI_EXTISR {
         volatile SERIAL_BREAK_CALLBACK breakcb;
 
     public:
-        UART_USCI() { ; };
+        UART_USCI() {
+            isr_usci_uart_instance[usci_a_instance] = this;
+	};
 
 	NEVER_INLINE
         void begin(unsigned long bitrate) {
             usci_isr_installer();
-            isr_usci_uart_instance[usci_a_instance] = this;
 
             _baud = bitrate;
             ucactl1 = UCSWRST;
