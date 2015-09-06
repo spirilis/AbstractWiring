@@ -41,6 +41,10 @@ template <
     u8_SFR stateifg,
     u8_SFR txrxie,
     u8_SFR txrxifg,
+    uint8_t txiebit,
+    uint8_t rxiebit,
+    uint8_t txifgbit,
+    uint8_t rxifgbit,
     u8_SFR pxsel,
     u8_SFR pxsel2,
     enum PortselMode pxsel_specification,
@@ -73,7 +77,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
         // IRQ matters (and, really, the most important part of the entire codebase)
         NEVER_INLINE
         boolean isr_handle_txrx(void) {
-            if (txrxifg & UCB0TXIFG) {
+            if (txrxifg & txifgbit) {
                 if (twi_state == TWI_MTX) {
                     // MTX
                     // If there is data to send, then send it; otherwise, stop.
@@ -83,7 +87,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
                     } else {  // Last byte just sent?
                         twi_state = TWI_IDLE;
                         ucbctl1 |= UCTXSTP;
-                        txrxifg &= ~UCB0TXIFG;
+                        txrxifg &= ~txifgbit;
                         return true;  // Signal ISR to wake up CPU
                     }
                 } else if (twi_state == TWI_MRX) {
@@ -97,7 +101,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
                 }
             }
 
-            if (txrxifg & UCB0RXIFG) {
+            if (txrxifg & rxifgbit) {
                 if (twi_state == TWI_MRX) {
                     // MRX
                     rxbuf[rxhead++] = ucbrxbuf;
@@ -238,7 +242,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
             set_pxsel(pxsel, pxsel2, pxsel_specification, pxbits);
 
             stateie |= UCNACKIE | UCSTPIE | UCSTTIE | UCALIE;
-            txrxie |= UCB0TXIE | UCB0RXIE;
+            txrxie |= txiebit | rxiebit;
 
             ucbctl1 &= ~UCSWRST;
         };
@@ -326,7 +330,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
             twi_error = TWI_ERROR_NONE;
 
             stateie |= UCSTTIE | UCSTPIE | UCALIE | UCNACKIE;
-            txrxie |= UCB0TXIE | UCB0RXIE;
+            txrxie |= txiebit | rxiebit;
 
             // Check for timeout waiting for client to respond
             uint32_t mstart = millis();
@@ -358,7 +362,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
             } else {
                 ucbctl1 = UCSSEL_2 | UCSWRST;
                 stateie &= ~(UCSTTIE | UCSTPIE | UCALIE | UCNACKIE);
-                txrxie &= ~(UCB0TXIE | UCB0RXIE);
+                txrxie &= ~(txiebit | rxiebit);
             }
 
             if (twi_error != TWI_ERROR_NONE)
@@ -388,7 +392,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
             twi_error = TWI_ERROR_NONE;
 
             stateie |= UCSTTIE | UCSTPIE | UCALIE | UCNACKIE;
-            txrxie |= UCB0TXIE | UCB0RXIE;
+            txrxie |= txiebit | rxiebit;
 
             // Check for timeout waiting for client to respond
             uint32_t mstart = millis();
@@ -423,7 +427,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
             } else {
                 ucbctl1 = UCSSEL_2 | UCSWRST;
                 stateie &= ~(UCSTTIE | UCSTPIE | UCALIE | UCNACKIE);
-                txrxie &= ~(UCB0TXIE | UCB0RXIE);
+                txrxie &= ~(txiebit | rxiebit);
             }
 
             if (twi_error != TWI_ERROR_NONE)
