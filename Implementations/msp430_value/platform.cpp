@@ -18,14 +18,14 @@ enum msp430_sfr {
 };
 
 // avoid bitshifts with this
-uint8_t _bitvect[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+const uint8_t _bitvect[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
 
 // This stuff would normally be split out into a pins.h or pins.c file (e.g. pins_energia.h from Energia)
 #define CVOL (const volatile uint8_t *)
 #define VOL (volatile uint8_t *)
 
-const volatile uint8_t * _pxin[] = {CVOL &P1IN, CVOL &P2IN,
+const volatile uint8_t * const _pxin[] = {CVOL &P1IN, CVOL &P2IN,
 #ifdef __MSP430_HAS_PORT3_R__
 CVOL &P3IN,
 #else
@@ -38,7 +38,7 @@ NULL
 #endif
 };
 
-const volatile uint8_t * _pxout[] = {CVOL &P1OUT, CVOL &P2OUT,
+const volatile uint8_t * const _pxout[] = {CVOL &P1OUT, CVOL &P2OUT,
 #ifdef __MSP430_HAS_PORT3_R__
 CVOL &P3OUT,
 #else
@@ -51,7 +51,7 @@ NULL
 #endif
 };
 
-const volatile uint8_t * _pxdir[] = {CVOL &P1DIR, CVOL &P2DIR,
+const volatile uint8_t * const _pxdir[] = {CVOL &P1DIR, CVOL &P2DIR,
 #ifdef __MSP430_HAS_PORT3_R__
 CVOL &P3DIR,
 #else
@@ -64,7 +64,7 @@ NULL
 #endif
 };
 
-const volatile uint8_t * _pxren[] = {CVOL &P1REN, CVOL &P2REN,
+const volatile uint8_t * const _pxren[] = {CVOL &P1REN, CVOL &P2REN,
 #ifdef __MSP430_HAS_PORT3_R__
 CVOL &P3REN,
 #else
@@ -77,7 +77,7 @@ NULL
 #endif
 };
 
-const volatile uint8_t * _pxsel[] = {CVOL &P1SEL, CVOL &P2SEL,
+const volatile uint8_t * const _pxsel[] = {CVOL &P1SEL, CVOL &P2SEL,
 #ifdef __MSP430_HAS_PORT3_R__
 CVOL &P3SEL,
 #else
@@ -90,7 +90,7 @@ NULL
 #endif
 };
 
-const volatile uint8_t * _pxsel2[] = {CVOL &P1SEL2, CVOL &P2SEL2,
+const volatile uint8_t * const _pxsel2[] = {CVOL &P1SEL2, CVOL &P2SEL2,
 #ifdef __MSP430_HAS_PORT3_R__
 CVOL &P3SEL2,
 #else

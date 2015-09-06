@@ -115,7 +115,7 @@ unsigned long pulseIn(int pin, uint8_t state, unsigned long timeout = 1000000L);
 void tone(int _pin, unsigned int frequency, unsigned long duration = 0);
 void noTone(int _pin);
 
-extern uint8_t _bitvect[];  // faster _BV for apps that only need an 8-bit number
+extern const uint8_t _bitvect[];  // faster _BV for apps that only need an 8-bit number
 #define _BV(x) (1 << x)
 
 char * itoa( int value, char *string, int radix ) ;

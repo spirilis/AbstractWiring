@@ -51,8 +51,8 @@ template <
 class Wire_USCI : public TwoWire_USCI_EXTISR {
     private:
         uint32_t _clock;
-        enum USCI_TwoWire_state twi_state;
-        enum USCI_TwoWire_error twi_error;
+        volatile enum USCI_TwoWire_state twi_state;
+        volatile enum USCI_TwoWire_error twi_error;
         TWOWIRE_SLAVE_TX_CALLBACK stx_callback;
         TWOWIRE_SLAVE_RX_CALLBACK srx_callback;
         volatile uint8_t txbuf[txbuf_len], rxbuf[rxbuf_len];
@@ -79,20 +79,22 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
                     // If there is data to send, then send it; otherwise, stop.
                     if (txhead < txtail) {
                         ucbtxbuf = txbuf[txhead++];
+                        return false;
                     } else {  // Last byte just sent?
                         twi_state = TWI_IDLE;
                         ucbctl1 |= UCTXSTP;
+                        txrxifg &= ~UCB0TXIFG;
                         return true;  // Signal ISR to wake up CPU
                     }
-                } else {
+                } else if (twi_state == TWI_MRX) {
                     // STX
                     // Cool feature idea to add here - "auto answer" mode
                     if (txhead == txtail)
                         ucbctl1 |= UCTXNACK;  // No more bytes to send; NACK the bus
                     else
                         ucbtxbuf = txbuf[txhead++];
+                    return false;
                 }
-                return false;
             }
 
             if (txrxifg & UCB0RXIFG) {
@@ -116,7 +118,6 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
                         ucbctl1 |= UCTXNACK;  // No; send NACK and ignore byte.
                     }
                 }
-                return false;
             }
             return false;
         };
@@ -186,10 +187,16 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
                 twi_state = TWI_IDLE;
                 return true;
             }
-            return false;  // technically should never reach here
+            return false;
         };
 
         // Administrative matters
+        NEVER_INLINE
+        void setSpeed(uint32_t bitrate) {
+            _clock = bitrate;
+            configClock(bitrate);
+        };
+
         NEVER_INLINE
         void begin(void) {
             ucbctl1 = UCSSEL_2 | UCSWRST;
@@ -211,7 +218,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
         };
 
         NEVER_INLINE
-        void begin(int addr, boolean has_10bit) {
+        void begin(int addr) {
             ucbctl1 = UCSSEL_2 | UCSWRST;
             ucbctl0 = UCMODE_3 | UCSYNC;
             i2coa = addr & 0x1FF;
@@ -236,8 +243,7 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
             ucbctl1 &= ~UCSWRST;
         };
 
-        void begin(int addr) { begin(addr, true); };
-        void begin(uint8_t addr) { begin (addr, false); };
+        void begin(uint8_t addr) { begin (addr); };
 
         NEVER_INLINE
         void end(void) {
@@ -344,10 +350,15 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
 
             while (ucbctl1 & UCTXSTP)  // Wait for STOP condition to complete before resetting bus
                 ;
-            ucbctl1 = UCSSEL_2 | UCSWRST;
+
             if (is_slave) {
+                ucbctl1 |= UCSWRST;
                 ucbctl0 &= ~UCMST;
                 ucbctl1 &= ~UCSWRST;
+            } else {
+                ucbctl1 = UCSSEL_2 | UCSWRST;
+                stateie &= ~(UCSTTIE | UCSTPIE | UCALIE | UCNACKIE);
+                txrxie &= ~(UCB0TXIE | UCB0RXIE);
             }
 
             if (twi_error != TWI_ERROR_NONE)
@@ -357,11 +368,11 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
 
         NEVER_INLINE
         int requestFrom(int addr, int len) {
-            rxhead = 0;
-            rxtail = 0;
-
-            if (len < 1)
+            if (len < 1 || (size_t)len > rxbuf_len)
                 return 0;  // Nothing to do!
+
+            rxhead = 0;
+            rxtail = len;
 
             ucbctl1 |= UCSWRST;
             i2csa = addr & 0x1FF;
@@ -404,10 +415,15 @@ class Wire_USCI : public TwoWire_USCI_EXTISR {
 
             while (ucbctl1 & UCTXSTP)  // Wait for STOP condition to complete before resetting bus
                 ;
-            ucbctl1 = UCSSEL_2 | UCSWRST;
+
             if (is_slave) {
+                ucbctl1 |= UCSWRST;
                 ucbctl0 &= ~UCMST;
                 ucbctl1 &= ~UCSWRST;
+            } else {
+                ucbctl1 = UCSSEL_2 | UCSWRST;
+                stateie &= ~(UCSTTIE | UCSTPIE | UCALIE | UCNACKIE);
+                txrxie &= ~(UCB0TXIE | UCB0RXIE);
             }
 
             if (twi_error != TWI_ERROR_NONE)
