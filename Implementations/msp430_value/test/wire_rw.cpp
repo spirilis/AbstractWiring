@@ -19,7 +19,7 @@ int main()
 
 	sysinit(16000000UL);
 	Wire.begin();
-	Wire.setSpeed(600000UL);
+	//Wire.setSpeed(600000UL);
 	Serial.begin(9600);
 
 	pinMode(4, INPUT_PULLUP);
