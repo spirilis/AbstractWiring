@@ -26,7 +26,8 @@ class AbstractSerial : public Stream {
         virtual size_t write(uint8_t) = 0;
         using Print::write;
         operator bool();
-	void isr_send_char(void); // Utility function used by ISR
+	void isr_send_char(void); // Utility function used by ISR for TX
+	void isr_get_char(void);  // Utility function used by ISR for RX
 
         // Extended API - optional - if implemented by subclass, override next function to return true
         virtual boolean hasExtendedAPI(void) { return false; }

@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "Energia.h"
+#include <AbstractWiring.h>
 
 #include "Print.h"
 
