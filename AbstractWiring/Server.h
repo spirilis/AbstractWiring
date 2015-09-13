@@ -20,9 +20,15 @@
 #ifndef server_h
 #define server_h
 
+#include <Print.h>
+#include <Client.h>
+
 class Server : public Print {
 public:
-  virtual void begin() =0;
+  virtual void begin(void) = 0;
+  virtual void end(void) = 0;
+  virtual int available(void) = 0;
+  virtual Client & accept(void) = 0;
 };
 
 #endif

@@ -69,6 +69,7 @@ class SPIClass {
         virtual void usingInterrupt(int pin) = 0;
 
         // Extended API - optional - if implemented by subclass, override next function to return true
+#define SPI_HAS_EXTENDED_API 1
         virtual boolean hasExtendedAPI(void) { return false; };
 
         virtual uint16_t transfer16(uint16_t) { return 0; };
