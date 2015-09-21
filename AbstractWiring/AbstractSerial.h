@@ -30,6 +30,7 @@ class AbstractSerial : public Stream {
 	void isr_get_char(void);  // Utility function used by ISR for RX
 
         // Extended API - optional - if implemented by subclass, override next function to return true
+        #define SERIAL_HAS_EXTENDED_API 1
         virtual boolean hasExtendedAPI(void) { return false; }
 
         virtual void set7Bit(boolean yn) { };
